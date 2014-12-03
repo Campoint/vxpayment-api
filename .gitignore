@@ -1,0 +1,16 @@
+.DS_Store
+:2e*
+*.bak
+.AppleDouble
+.project
+.cache
+.settings
+.buildpath
+.BridgeCache*
+nbproject
+.idea
+vendor
+build
+phpunit.xml
+*.lint
+node_modules
