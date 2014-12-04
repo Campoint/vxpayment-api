@@ -70,4 +70,10 @@
     <target name="build" depends="jshint,compressjs,karma">
     </target>
 
+	<target name="init" description="Installs all packages for development" depends="dev">
+	</target>
+
+	<target name="test" depends="karma">
+	</target>
+
 </project>
