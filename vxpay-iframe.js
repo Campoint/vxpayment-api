@@ -336,13 +336,17 @@ ModalboxPayment.prototype.removeSpinner = function () {
 };
 
 ModalboxPayment.prototype.showSpinner = function () {
-	this.spinner = this.createSpinner();
-	this.window.document.body.appendChild(this.spinner);
+	if(!this.spinner) {
+		this.spinner = this.createSpinner();
+		this.window.document.body.appendChild(this.spinner);
+	}
 };
 
 ModalboxPayment.prototype.showOverlay = function () {
-	this.overlay = this.createOverlay();
-	this.window.document.body.appendChild(this.overlay);
+	if(!this.overlay) {
+		this.overlay = this.createOverlay();
+		this.window.document.body.appendChild(this.overlay);
+	}
 };
 
 ModalboxPayment.prototype.getGet = function (sVar) {
