@@ -46,6 +46,7 @@ ModalboxPayment.prototype.setOptions = function (options) {
 	this.options.wt = options.wt;
 	this.options.option = options.option;
 	this.options.lang = options.lang;
+	this.options.environment = options.environment;
 	this.options.flow = options.flow;
 };
 
@@ -154,6 +155,8 @@ ModalboxPayment.prototype.show = function (path) {
 	if (!this.ready) {
 		this.showSpinner();
 		this.initIframe(path);
+	} else if(path !== '') {
+		this._changeRoute('/' + path);
 	}
 
 	this.visible = true;
@@ -167,6 +170,13 @@ ModalboxPayment.prototype.show = function (path) {
 
 	this.postMessage(JSON.stringify({
 		type: 'modalbox-is-visible'
+	}), this.iframe.contentWindow);
+};
+
+ModalboxPayment.prototype._changeRoute = function (route) {
+	this.postMessage(JSON.stringify({
+		type: 'modalbox-change-route',
+		route: route
 	}), this.iframe.contentWindow);
 };
 
@@ -540,8 +550,20 @@ ModalboxPayment.prototype._generateSuccessUrl = function () {
  * @param paytype
  */
 ModalboxPayment.prototype.openPaytourByPaytype = function (paytype) {
-	this.sendOptions({ paytype: paytype });
-	this.show('amount');
+	var flow = 'moneycharge'; /** TODO: Move into business logic **/
+	this.options.flow = flow;
+	this.sendOptions({ paytype: paytype, flow: flow });
+	this.show('');
+};
+
+/**
+ * Open Paytour in abo flow
+ * @param paytype
+ */
+ModalboxPayment.prototype.openAboPaytour = function (flow) {
+	this.options.flow = flow;
+	this.sendOptions({ flow: flow });
+	this.show('abo');
 };
 
 /**
