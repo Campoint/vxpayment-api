@@ -21,7 +21,6 @@ var ModalboxPayment = function (urls, window, options, config) {
 
 	// save viewport scale on start
 	this.origScale = this.getScale();
-	this.origWidth = this.window.parent.document.body.clientWidth;
 	this.view = '';
 	this.ready = false;
 	this.loaded = false;
@@ -446,29 +445,40 @@ ModalboxPayment.prototype.updateOrientation = function () {
 
 // sets viewport in the parent
 ModalboxPayment.prototype._setParentViewport = function () {
-	// set viewport for parent
-	var viewPortTag = document.getElementById('viewport');
+	try {
+		// set viewport for parent
+		var viewPortTag = document.getElementById('viewport');
 
-	if (!viewPortTag) {
-		viewPortTag = document.createElement('meta');
-		viewPortTag.id = 'viewport';
-		viewPortTag.name = 'viewport';
-		this.window.parent.document.getElementsByTagName('head')[0].appendChild(viewPortTag);
-	}
+		if (!viewPortTag) {
+			viewPortTag = document.createElement('meta');
+			viewPortTag.id = 'viewport';
+			viewPortTag.name = 'viewport';
+			this.window.parent.document.getElementsByTagName('head')[0].appendChild(viewPortTag);
+		}
 
-	viewPortTag.content = 'width=device-width, minimum-scale=1.0, maximum-scale=1.0, initial-scale=1.0';
+		viewPortTag.content = 'width=device-width, minimum-scale=1.0, maximum-scale=1.0, initial-scale=1.0';
 
-	// viewport on gesture for iphones
-	if (navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPad/i)) {
-		this.addEvent('gesturestart', this.window.document.body, function () {
-			viewPortTag.content = 'width=device-width, minimum-scale=0.25, maximum-scale=1.6';
-		});
+		// viewport on gesture for iphones
+		if (navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPad/i)) {
+			this.addEvent('gesturestart', this.window.document.body, function () {
+				viewPortTag.content = 'width=device-width, minimum-scale=0.25, maximum-scale=1.6';
+			});
+		}
+	} catch(e) {
+		return false;
 	}
 };
 
 ModalboxPayment.prototype._restoreParentViewport = function () {
-	var viewport = document.getElementById('viewport');
-	viewport.setAttribute('content', 'width=device-width, initial-scale=1');
+	try {
+		var viewport = document.getElementById('viewport');
+
+		if (viewport) {
+			viewport.setAttribute('content', 'width=device-width, initial-scale=1');
+		}
+	} catch (e) {
+		return false;
+	}
 };
 
 ModalboxPayment.prototype._generateUrl = function (baseUrl, params, config, hash) {
