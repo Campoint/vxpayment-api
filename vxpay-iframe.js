@@ -162,7 +162,7 @@ ModalboxPayment.prototype.show = function (path) {
 	if (!this.ready) {
 		this.showSpinner();
 		this.initIframe(path);
-	} else if(path !== '') {
+	} else if(typeof path !== 'undefined' && path !== '') {
 		this._changeRoute('/' + path);
 	}
 
