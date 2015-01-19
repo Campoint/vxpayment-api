@@ -13,7 +13,7 @@ var ModalboxPayment = function (urls, window, options, config) {
 
 	this.setUrls(urls);
 	this.setOptions(options);
-	this.modConfig = config;
+	this.setConfig(config);
 
 	this.iframeId = 'modalboxiframe';
 	this.overlayId = this.iframeId + 'Overlay';
@@ -47,6 +47,11 @@ ModalboxPayment.prototype.setOptions = function (options) {
 	this.options.lang = options.lang;
 	this.options.environment = options.environment;
 	this.options.flow = options.flow;
+};
+
+ModalboxPayment.prototype.setConfig = function (config) {
+	this.modConfig = config || {};
+	this.modConfig.parentInFrame = this.isParentInFrame();
 };
 
 ModalboxPayment.prototype.setUrls = function (urls) {
@@ -536,6 +541,14 @@ ModalboxPayment.prototype.log = function (message) {
 
 ModalboxPayment.prototype.isMobile = function () {
 	return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+};
+
+ModalboxPayment.prototype.isParentInFrame = function () {
+	try {
+		return window.self !== window.top ? 1 : 0;
+	} catch (e) {
+		return 1;
+	}
 };
 
 // creates final URL for redirect
