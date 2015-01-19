@@ -1,0 +1,6 @@
+{
+  "conduit_uri" : "https://phabricator.x/",
+  "load" : [
+    "/home/phabricator/gcworkflows/src/"
+  ]
+}

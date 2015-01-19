@@ -104,8 +104,11 @@ ModalboxPayment.prototype.messageHandler = function (evt) {
 		modalbox.removeIframe();
 	}
 	// catch transfer_token
-	else if (data.match(/^transfer_token:(.*)/)) {
-		res = data.match(/^transfer_token:(.*)/);
+	else if ((res = data.match(/^redirect:(.*)/))) {
+		modalbox.window.location.href = res[1];
+	}
+	// catch transfer_token
+	else if ((res = data.match(/^transfer_token:(.*)/))) {
 		modalbox.transferToken = res[1];
 
 		// send additional parameters back
