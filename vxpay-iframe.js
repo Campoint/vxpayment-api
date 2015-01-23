@@ -108,6 +108,11 @@ ModalboxPayment.prototype.messageHandler = function (evt) {
 		modalbox.window.location.href = modalbox._generateSuccessUrl();
 		modalbox.removeIframe();
 	}
+	else if (data === 'modalbox-view-ready') {
+		modalbox.postMessage(JSON.stringify({
+			type: 'modalbox-is-visible'
+		}), modalbox.iframe.contentWindow);
+	}
 	// catch transfer_token
 	else if ((res = data.match(/^redirect:(.*)/))) {
 		modalbox.window.location.href = res[1];
@@ -164,20 +169,16 @@ ModalboxPayment.prototype.show = function (path) {
 		this.initIframe(path);
 	} else if(typeof path !== 'undefined' && path !== '') {
 		this._changeRoute('/' + path);
+	} else {
+		this._changeRoute(undefined);
 	}
 
 	this.visible = true;
-
 	this.initSession();
-
 	this.iframe.style.display = 'block';
 
 	// scroll parent to top - for mobiles
 	this.window.scrollTo(0,1);
-
-	this.postMessage(JSON.stringify({
-		type: 'modalbox-is-visible'
-	}), this.iframe.contentWindow);
 };
 
 ModalboxPayment.prototype._changeRoute = function (route) {
