@@ -594,6 +594,16 @@ ModalboxPayment.prototype.openAboPaytour = function (flow) {
 };
 
 /**
+ * Open Paytour in Creditcard change flow
+ * @param paytype
+ */
+ModalboxPayment.prototype.openChangeCreditcard = function (flow) {
+	this.options.flow = flow;
+	this.sendOptions({ flow: flow });
+	this.show('address');
+};
+
+/**
  * @deprecated
  * @param paytype
  */
