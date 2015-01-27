@@ -613,9 +613,6 @@ ModalboxPayment.prototype.show = function (route) {
  * Open paytour and show given route
  */
 ModalboxPayment.prototype.showPaytour = function (route) {
-	if(route === 'signup') {
-		route = '';
-	}
 	this._show(route);
 	return false;
 };
