@@ -151,7 +151,7 @@ ModalboxPayment.prototype.tryRestore = function () {
 ModalboxPayment.prototype.restore = function () {
 	this.view = 'wait';
 	this.initIframe(this.view);
-	this.show();
+	this._show();
 };
 
 ModalboxPayment.prototype.init = function (path) {
@@ -159,7 +159,7 @@ ModalboxPayment.prototype.init = function (path) {
 	this.initIframe(path);
 };
 
-ModalboxPayment.prototype.show = function (path) {
+ModalboxPayment.prototype._show = function (path) {
 	var that = this;
 	this.showOverlay();
 	this._setParentViewport();
@@ -580,17 +580,17 @@ ModalboxPayment.prototype.openPaytourByPaytype = function (paytype) {
 	var flow = 'moneycharge'; /** TODO: Move into business logic **/
 	this.options.flow = flow;
 	this.sendOptions({ paytype: paytype, flow: flow });
-	this.show('');
+	this._show('');
 };
 
 /**
  * Open Paytour in abo flow
- * @param paytype
+ * @param flow
  */
 ModalboxPayment.prototype.openAboPaytour = function (flow) {
 	this.options.flow = flow;
 	this.sendOptions({ flow: flow });
-	this.show('abo');
+	this._show('abo');
 };
 
 /**
@@ -599,4 +599,35 @@ ModalboxPayment.prototype.openAboPaytour = function (flow) {
  */
 ModalboxPayment.prototype.showAmount = function (paytype) {
 	this.openPaytourByPaytype(paytype);
+};
+
+/**
+ * Only provided to keep compatibility with older versions
+ * @deprecated
+ */
+ModalboxPayment.prototype.show = function (route) {
+	this._show(route);
+};
+
+/**
+ * Open paytour and show given route
+ */
+ModalboxPayment.prototype.showPaytour = function (route) {
+	if(route === 'signup') {
+		route = '';
+	}
+	this._show(route);
+	return false;
+};
+
+/**
+ * initialize paytour with default options
+ */
+ModalboxPayment.prototype.initPaytour = function() {
+	this.options.environment = "lp";
+	this.options.flow = "moneycharge";
+
+	if (!this.tryRestore()) {
+		this.init('');
+	}
 };
