@@ -3,72 +3,88 @@
 
 <project name="vxpayment" basedir=".">
 
-    <property name="php" value="/home/php/bin/php"/>
-    <property name="bin" value="${basedir}/bin"/>
-    <property name="vendor_bin" value="${basedir}/vendor/bin"/>
-    <property name="src_dir" value="${basedir}/src/"/>
-    <property name="http_root" value="${basedir}/http-root/"/>
-    <property name="tests_dir" value="${basedir}/tests"/>
-    <property name="bdd_dir" value="${basedir}/features"/>
-    <property name="server_port" value="9123"/>
-    <property name="server_host" value="localhost"/>
+	<property name="php" value="/home/php/bin/php"/>
+	<property name="bin" value="${basedir}/bin"/>
+	<property name="vendor_bin" value="${basedir}/vendor/bin"/>
+	<property name="src_dir" value="${basedir}/src/"/>
+	<property name="http_root" value="${basedir}/http-root/"/>
+	<property name="tests_dir" value="${basedir}/tests"/>
+	<property name="bdd_dir" value="${basedir}/features"/>
+	<property name="server_port" value="9123"/>
+	<property name="server_host" value="localhost"/>
 	<property name="npm" value="/usr/local/bin/npm"/>
 	<property name="jshint" value="${basedir}/node_modules/.bin/jshint"/>
 	<property name="karma" value="${basedir}/node_modules/karma/bin/karma"/>
 	<property name="dalek" value="${basedir}/node_modules/.bin/dalek"/>
 
-    <target name="clean" description="Removes build folders and stuff like that">
-        <delete dir="${basedir}/build"/>
+	<target name="clean" description="Removes build folders and stuff like that">
+		<delete dir="${basedir}/build"/>
 
-        <mkdir dir="${basedir}/build"/>
-        <mkdir dir="${basedir}/build/coverage"/>
-        <mkdir dir="${basedir}/build/logs"/>
-        <mkdir dir="${basedir}/build/pdepend"/>
-        <mkdir dir="${basedir}/build/docs"/>
-    </target>
+		<mkdir dir="${basedir}/build"/>
+		<mkdir dir="${basedir}/build/coverage"/>
+		<mkdir dir="${basedir}/build/logs"/>
+		<mkdir dir="${basedir}/build/pdepend"/>
+		<mkdir dir="${basedir}/build/docs"/>
+	</target>
 
-    <target name="gettext" description="Produces GNU gettext MO files">
-        <exec dir="${bin}" executable="${php}">
-            <arg line="gettext.php"/>
-        </exec>
-    </target>
+	<target name="gettext" description="Produces GNU gettext MO files">
+		<exec dir="${bin}" executable="${php}">
+			<arg line="gettext.php"/>
+		</exec>
+	</target>
 
-    <!-- Release Tasks -->
-    <target name="compressjs" description="Compresses the JS Files">
-        <exec dir="${basedir}" executable="uglifyjs">
-	    <arg value="${basedir}/vxpay-iframe.js"/>
-            <arg value="-o"/>
-            <arg value="${basedir}/vxpay-iframe.min.js"/>
-        </exec>
-    </target>
+	<!-- Release Tasks -->
+	<target name="compressjs" description="Compresses the JS Files">
+		<exec dir="${basedir}" executable="uglifyjs">
+			<arg value="${basedir}/vxpay-iframe.js"/>
+			<arg value="--comments"/>
+			<arg value="/version/"/>
+			<arg value="-o"/>
+			<arg value="${basedir}/vxpay-iframe.min.js"/>
+		</exec>
+	</target>
 
-    <target name="dev" description="Installs all packages for development" depends="dev-npm">
-    </target>
+	<target name="dev" description="Installs all packages for development" depends="dev-npm">
+	</target>
 
-    <target name="dev-npm">
-	<mkdir dir="${basedir}/node_modules"/>
-	<exec executable="${npm}">
-	    <arg value="install"/>
-	    <arg value="--save-dev"/>
-	</exec>
-    </target>
+	<target name="dev-npm">
+		<mkdir dir="${basedir}/node_modules"/>
+		<exec executable="${npm}">
+			<arg value="install"/>
+			<arg value="--save-dev"/>
+		</exec>
+	</target>
 
-    <target name="jshint">
-	<exec executable="${jshint}">
-	    <arg value="--exclude-path=${basedir}/.jshintignore"/>
-	    <arg path="${basedir}/vxpay-iframe.js"/>
-	</exec>
-    </target>
+	<target name="jshint">
+		<exec executable="${jshint}">
+			<arg value="--exclude-path=${basedir}/.jshintignore"/>
+			<arg path="${basedir}/vxpay-iframe.js"/>
+		</exec>
+	</target>
 
-    <target name="karma">
-        <exec executable="${karma}">
-		<arg value="start"/>
-		<arg path="${tests_dir}/karma.conf.js"/>
-	</exec>
-    </target>
+	<target name="karma">
+		<exec executable="${karma}">
+			<arg value="start"/>
+			<arg path="${tests_dir}/karma.conf.js"/>
+		</exec>
+	</target>
 
-    <target name="build" depends="jshint,compressjs,karma">
-    </target>
+	<target name="version-tag">
+		<exec executable="git" resolveexecutable="true" outputproperty="apiVersion">
+			<arg value="describe"/>
+			<arg value="--tags"/>
+			<arg value="master"/>
+		</exec>
+
+		<replaceregexp file="${basedir}/vxpay-iframe.js"
+					   match="(@version [0-9\.]+)"
+					   replace="@version ${apiVersion}"
+					   byline="true"
+				/>
+	</target>
+
+	<target name="build" depends="jshint,compressjs,karma,version-tag">
+	</target>
 
 	<target name="init" description="Installs all packages for development" depends="dev">
 	</target>

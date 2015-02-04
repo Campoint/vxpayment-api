@@ -1,3 +1,4 @@
+/** @version 1.1.0 */
 /*jshint strict:false */
 
 /**
@@ -6,7 +7,7 @@
  *
  * @author ph
  */
-var ModalboxPayment = function (urls, window, options, config) {
+var ModalboxPayment = function (urls, window, options, config, events) {
 	this.window = window;
 	this.transferToken = '';
 	this.redirectToken = options.tt || this.getGet('redirect_token');
@@ -14,6 +15,7 @@ var ModalboxPayment = function (urls, window, options, config) {
 	this.setUrls(urls);
 	this.setOptions(options);
 	this.setConfig(config);
+	this.setEvents(events);
 
 	this.iframeId = 'modalboxiframe';
 	this.overlayId = this.iframeId + 'Overlay';
@@ -26,9 +28,6 @@ var ModalboxPayment = function (urls, window, options, config) {
 	this.loaded = false;
 	this.visible = false;
 	this.window.ModalboxPayment = this;
-
-	// events
-	this.onClose = null;
 };
 
 ModalboxPayment.prototype.setOptions = function (options) {
@@ -67,6 +66,14 @@ ModalboxPayment.prototype.setUrls = function (urls) {
 	}
 };
 
+ModalboxPayment.prototype.setEvents = function (events) {
+	// events
+	if (typeof events === 'object') {
+		this.onClose = typeof events.onClose === 'function' ? events.onClose : null;
+		this.onSuccess = typeof events.onSuccess === 'function' ? events.onSuccess : null;
+	}
+};
+
 ModalboxPayment.prototype.setOption = function (key, value) {
 	this.options = this.options || {};
 
@@ -75,11 +82,13 @@ ModalboxPayment.prototype.setOption = function (key, value) {
 
 ModalboxPayment.prototype.messageHandler = function (evt) {
 	var res = null;
-	var data = evt.data;
 	var modalbox = ModalboxPayment;
 
+	// serialized data?
+	var msgObject = modalbox._parseMessage(evt.data);
+
 	// on closing modalbox
-	if (data === 'modalbox-iframe-close') {
+	if (msgObject.type === 'modalbox-iframe-close') {
 		modalbox.hide();
 
 		// onClose callback
@@ -87,12 +96,12 @@ ModalboxPayment.prototype.messageHandler = function (evt) {
 			modalbox.onClose();
 		}
 	}
-	else if (data === 'modalbox-iframe-ready') {
+	else if (msgObject.type === 'modalbox-iframe-ready') {
 		modalbox.ready = true;
 		modalbox.removeSpinner();
 		modalbox.maximizeIframe();
 	}
-	else if (data === 'modalbox-content-loaded') {
+	else if (msgObject.type === 'modalbox-content-loaded') {
 		modalbox.loaded = true;
 		if (modalbox.visible) {
 			modalbox.initSession();
@@ -103,22 +112,27 @@ ModalboxPayment.prototype.messageHandler = function (evt) {
 		}
 	}
 	// on finished paytour
-	else if (data === 'modalbox-success') {
+	else if (msgObject.type === 'modalbox-success') {
 		//modalbox.log('Paytour success');
-		modalbox.window.location.href = modalbox._generateSuccessUrl();
-		modalbox.removeIframe();
+		if (typeof modalbox.onSuccess === 'function') {
+			modalbox.onSuccess(msgObject.data);
+			modalbox.hide();
+		} else {
+			modalbox.window.location.href = modalbox._generateSuccessUrl();
+			modalbox.hide();
+		}
 	}
-	else if (data === 'modalbox-view-ready') {
+	else if (msgObject.type === 'modalbox-view-ready') {
 		modalbox.postMessage(JSON.stringify({
 			type: 'modalbox-is-visible'
 		}), modalbox.iframe.contentWindow);
 	}
 	// catch transfer_token
-	else if ((res = data.match(/^redirect:(.*)/))) {
+	else if ((res = msgObject.type.match(/^redirect:(.*)/))) {
 		modalbox.window.location.href = res[1];
 	}
 	// catch transfer_token
-	else if ((res = data.match(/^transfer_token:(.*)/))) {
+	else if ((res = msgObject.type.match(/^transfer_token:(.*)/))) {
 		modalbox.transferToken = res[1];
 
 		// send additional parameters back
@@ -129,6 +143,28 @@ ModalboxPayment.prototype.messageHandler = function (evt) {
 			ruri: modalbox.options.ruri
 		}), modalbox.iframe.contentWindow);
 	}
+};
+
+ModalboxPayment.prototype._parseMessage = function (evtData) {
+	var obj = {};
+
+	try {
+		// parse event data to JSON object
+		var json = JSON.parse(evtData);
+
+		if (typeof json === 'object') {
+			obj.type = json.type;
+			obj.data = json.data;
+		} else {
+			obj.type = evtData;
+			obj.data = null;
+		}
+	} catch (e) {
+		obj.type = evtData;
+		obj.data = null;
+	}
+
+	return obj;
 };
 
 // register event listener
@@ -333,6 +369,7 @@ ModalboxPayment.prototype.removeIframe = function () {
 		this.ready = false;
 		this.loaded = false;
 		this.window.ModalboxPayment = null;
+		this.removeOverlay();
 		this._restoreParentViewport();
 	}
 };
@@ -587,9 +624,9 @@ ModalboxPayment.prototype.openPaytourByPaytype = function (paytype) {
  * Open Paytour in abo flow
  * @param flow
  */
-ModalboxPayment.prototype.openAboPaytour = function (flow) {
-	this.options.flow = flow;
-	this.sendOptions({ flow: flow });
+ModalboxPayment.prototype.openAboPaytour = function () {
+	this.options.flow = 'vipabo';
+	this.sendOptions({ flow: this.options.flow });
 	this._show('abo');
 };
 
@@ -597,10 +634,20 @@ ModalboxPayment.prototype.openAboPaytour = function (flow) {
  * Open Paytour in Creditcard change flow
  * @param paytype
  */
-ModalboxPayment.prototype.openChangeCreditcard = function (flow) {
-	this.options.flow = flow;
-	this.sendOptions({ flow: flow });
+ModalboxPayment.prototype.openChangeCreditcard = function () {
+	this.options.flow = 'changecc';
+	this.sendOptions({ flow: this.options.flow });
 	this.show('address');
+};
+
+/**
+ * Open Paytour in Login flow
+ * @param flow
+ */
+ModalboxPayment.prototype.openLogin = function () {
+	this.options.flow = 'login';
+	this.sendOptions({ flow: this.options.flow });
+	this.show('login');
 };
 
 /**
@@ -624,7 +671,6 @@ ModalboxPayment.prototype.show = function (route) {
  */
 ModalboxPayment.prototype.showPaytour = function (route) {
 	this._show(route);
-	return false;
 };
 
 /**

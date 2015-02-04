@@ -105,7 +105,11 @@ describe('Modalbox JS API Test', function() {
 		var conf = {
 			showTeaser: 1
 		};
-		var successUrl = 'http://www.visit-x.net/';
+		var events = {
+			onSuccess: function () {
+				return true;
+			}
+		};
 
 		win.location = {};
 		win.location.search = '?redirect_token=ttt';
@@ -114,11 +118,21 @@ describe('Modalbox JS API Test', function() {
 		win.parent.document = {};
 		win.parent.document.body = { clientWidth: 1000 };
 
-		var modalbox = new ModalboxPayment(baseUrl, win, options, conf);
+		var modalbox = new ModalboxPayment(baseUrl, win, options, conf, events);
 		modalbox.transferToken = tt_token;
+
+		// set onClose extern
+		modalbox.onClose = function () { return 'over'; };
 
 		it('modConfig params in URL?', function() {
 			expect(modalbox._generateUrl(modalbox.baseUrl, options, modalbox.modConfig)).toMatch(new RegExp('mc\[[a-z]+\]=', 'i'));
+		});
+		it('callbacks set?', function() {
+			expect(typeof modalbox.onSuccess).toEqual('function');
+			expect(typeof modalbox.onClose).toEqual('function');
+		});
+		it('callback overwritten?', function() {
+			expect(modalbox.onClose()).toEqual('over');
 		});
 	});
 
@@ -158,7 +172,6 @@ describe('Modalbox JS API Test', function() {
 
 		var baseUrl = '/paytour1?ovif=1&option=CSB10E&s=4310290& ' + adtv;
 		var win = {};
-		var successUrl = 'http://www.visit-x.xxx/';
 
 		win.location = {};
 		win.location.search = '?redirect_token=ttt';
@@ -193,6 +206,34 @@ describe('Modalbox JS API Test', function() {
 		it('adtv in URL', function() {
 			var generatedUrl = modalbox._generateUrl(modalbox.baseUrl, opts);
 			expect(generatedUrl).toMatch(new RegExp('adtv=' + adtv, 'i'));
+		});
+	});
+
+	describe('postMessage parser', function() {
+		//var msgObject = modalbox._parseMessage(evt.data);
+		var baseUrl = 'https://ph.vxpayment.x/';
+
+		var win = {};
+		win.location = {};
+		win.location.search = '?redirect_token=ttt';
+		win.location.href = 'http://ph.vxpayment-test.x';
+		win.parent = {};
+		win.parent.document = {};
+		win.parent.document.body = { clientWidth: 1000 };
+
+		var modalbox = new ModalboxPayment(baseUrl, win, options);
+
+		it('string as postMessage', function() {
+			var msg = 'modalbox-success';
+			var res = { type: msg, data: null };
+
+			expect(modalbox._parseMessage(msg)).toEqual(res);
+		});
+		it('serialized object as postMessage', function() {
+			var obj = { type: 'modalbox-success', data: { availableMoney: 300 }};
+			var msg = JSON.stringify(obj);
+
+			expect(modalbox._parseMessage(msg)).toEqual(obj);
 		});
 	});
 });
