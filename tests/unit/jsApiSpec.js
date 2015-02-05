@@ -236,4 +236,67 @@ describe('Modalbox JS API Test', function() {
 			expect(modalbox._parseMessage(msg)).toEqual(obj);
 		});
 	});
+
+	/** specials for calling Paytour on LPs */
+	describe('init, tryRestore, initPaytour', function() {
+		//var msgObject = modalbox._parseMessage(evt.data);
+		var baseUrl = 'https://ph.vxpayment.x/';
+
+		var win = {};
+		win.location = {};
+		win.location.search = '';
+		win.location.href = 'http://ph.vxpayment-test.x';
+		win.parent = {};
+		win.parent.document = {};
+		win.parent.document.body = { clientWidth: 1000 };
+
+		var modalbox = new ModalboxPayment(baseUrl, win, options);
+
+		it('show() method exists?', function() {
+			expect(typeof modalbox.show).toEqual('function');
+		});
+		it('sendOptions() method exists?', function() {
+			expect(typeof modalbox.sendOptions).toEqual('function');
+		});
+		it('old init() method exists?', function() {
+			expect(typeof modalbox.init).toEqual('function');
+		});
+		it('old tryRestore() method exists?', function() {
+			expect(typeof modalbox.tryRestore).toEqual('function');
+		});
+		it('new wrapping initPaytour() method exists and works?', function() {
+			expect(typeof modalbox.initPaytour).toEqual('function');
+
+			spyOn(modalbox, 'init');
+			modalbox.initPaytour();
+			expect(modalbox.init).toHaveBeenCalled();
+			
+			spyOn(modalbox, 'tryRestore');
+			modalbox.initPaytour();
+			expect(modalbox.init).toHaveBeenCalled();
+		});
+	});
+
+	/** Flow tests */
+	describe('existing Flow methods?', function() {
+		//var msgObject = modalbox._parseMessage(evt.data);
+		var baseUrl = 'https://ph.vxpayment.x/';
+
+		var win = {};
+		win.location = {};
+		win.location.search = '';
+		win.location.href = 'http://ph.vxpayment-test.x';
+		win.parent = {};
+		win.parent.document = {};
+		win.parent.document.body = { clientWidth: 1000 };
+
+		var modalbox = new ModalboxPayment(baseUrl, win, options);
+
+		it('exist flow methods?', function() {
+			expect(typeof modalbox.openPaytourByPaytype).toEqual('function');
+			expect(typeof modalbox.openLogin).toEqual('function');
+			expect(typeof modalbox.openAboPaytour).toEqual('function');
+			expect(typeof modalbox.openChangeCreditcard).toEqual('function');
+		});
+	});
 });
