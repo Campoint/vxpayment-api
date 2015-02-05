@@ -10,7 +10,7 @@
 var ModalboxPayment = function (urls, window, options, config, events) {
 	this.window = window;
 	this.transferToken = '';
-	this.redirectToken = options.tt || this.getGet('redirect_token');
+	this.redirectToken = options.tt || this._getGet('redirect_token');
 
 	this.setUrls(urls);
 	this.setOptions(options);
@@ -22,7 +22,7 @@ var ModalboxPayment = function (urls, window, options, config, events) {
 	this.spinnerId = this.iframeId + 'Spinner';
 
 	// save viewport scale on start
-	this.origScale = this.getScale();
+	this.origScale = this._getScale();
 	this.view = '';
 	this.ready = false;
 	this.loaded = false;
@@ -52,7 +52,7 @@ ModalboxPayment.prototype.setOptions = function (options) {
 
 ModalboxPayment.prototype.setConfig = function (config) {
 	this.modConfig = config || {};
-	this.modConfig.parentInFrame = this.isParentInFrame();
+	this.modConfig.parentInFrame = this._isParentInFrame();
 };
 
 ModalboxPayment.prototype.setUrls = function (urls) {
@@ -86,7 +86,7 @@ ModalboxPayment.prototype.setOption = function (key, value) {
  * postMessage handler
  * @param evt
  */
-ModalboxPayment.prototype.messageHandler = function (evt) {
+ModalboxPayment.prototype._messageHandler = function (evt) {
 	var res = null;
 	var modalbox = ModalboxPayment;
 
@@ -104,22 +104,22 @@ ModalboxPayment.prototype.messageHandler = function (evt) {
 	}
 	else if (msgObject.type === 'modalbox-iframe-ready') {
 		modalbox.ready = true;
-		modalbox.removeSpinner();
-		modalbox.maximizeIframe();
+		modalbox._removeSpinner();
+		modalbox._maximizeIframe();
 	}
 	else if (msgObject.type === 'modalbox-content-loaded') {
 		modalbox.loaded = true;
 		if (modalbox.visible) {
-			modalbox.initSession();
+			modalbox._initSession();
 
-			modalbox.postMessage(JSON.stringify({
+			modalbox._postMessage(JSON.stringify({
 				type: 'modalbox-is-visible'
 			}), modalbox.iframe.contentWindow);
 		}
 	}
 	// on finished paytour
 	else if (msgObject.type === 'modalbox-success') {
-		//modalbox.log('Paytour success');
+		//modalbox._log('Paytour success');
 		if (typeof modalbox.onSuccess === 'function') {
 			modalbox.onSuccess(msgObject.data);
 			modalbox.hide();
@@ -129,7 +129,7 @@ ModalboxPayment.prototype.messageHandler = function (evt) {
 		}
 	}
 	else if (msgObject.type === 'modalbox-view-ready') {
-		modalbox.postMessage(JSON.stringify({
+		modalbox._postMessage(JSON.stringify({
 			type: 'modalbox-is-visible'
 		}), modalbox.iframe.contentWindow);
 	}
@@ -142,8 +142,8 @@ ModalboxPayment.prototype.messageHandler = function (evt) {
 		modalbox.transferToken = res[1];
 
 		// send additional parameters back
-		//modalbox.log('updating session');
-		modalbox.postMessage(JSON.stringify({
+		//modalbox._log('updating session');
+		modalbox._postMessage(JSON.stringify({
 			type: 'modalbox-additional-info',
 			ref: modalbox.options.ref,
 			ruri: modalbox.options.ruri
@@ -177,24 +177,24 @@ ModalboxPayment.prototype._parseMessage = function (evtData) {
 ModalboxPayment.prototype._registerListener = function () {
 	var that = this;
 
-	this.addEvent('message', this.window, this.messageHandler);
+	this._addEvent('message', this.window, this._messageHandler);
 };
 
 // restore Modalbox after previous extern redirect
-ModalboxPayment.prototype.restore = function () {
+ModalboxPayment.prototype._restore = function () {
 	this.view = 'wait';
-	this.initIframe(this.view);
+	this._initIframe(this.view);
 	this._show();
 };
 
 ModalboxPayment.prototype._show = function (path) {
 	var that = this;
-	this.showOverlay();
+	this._showOverlay();
 	this._setParentViewport();
 
 	if (!this.ready) {
-		this.showSpinner();
-		this.initIframe(path);
+		this._showSpinner();
+		this._initIframe(path);
 	} else if(typeof path !== 'undefined' && path !== '') {
 		this._changeRoute('/' + path);
 	} else {
@@ -202,7 +202,7 @@ ModalboxPayment.prototype._show = function (path) {
 	}
 
 	this.visible = true;
-	this.initSession();
+	this._initSession();
 	this.iframe.style.display = 'block';
 
 	// scroll parent to top - for mobiles
@@ -210,13 +210,13 @@ ModalboxPayment.prototype._show = function (path) {
 };
 
 ModalboxPayment.prototype._changeRoute = function (route) {
-	this.postMessage(JSON.stringify({
+	this._postMessage(JSON.stringify({
 		type: 'modalbox-change-route',
 		route: route
 	}), this.iframe.contentWindow);
 };
 
-ModalboxPayment.prototype.initIframe = function (path) {
+ModalboxPayment.prototype._initIframe = function (path) {
 	if (!this.iframe) {
 		this._registerListener();
 
@@ -229,13 +229,13 @@ ModalboxPayment.prototype.initIframe = function (path) {
 		// create URL with params
 		var url = this._generateUrl(this.baseUrl, opts, this.modConfig, (path ? path : ''));
 
-		this.iframe = this.createIframe(url);
+		this.iframe = this._createIframe(url);
 
 		this.window.document.body.appendChild(this.iframe);
 	}
 };
 
-ModalboxPayment.prototype.createIframe = function (url) {
+ModalboxPayment.prototype._createIframe = function (url) {
 	var ifrm = this.window.document.createElement('iframe');
 	ifrm.src = url;
 	ifrm.id = this.iframeId;
@@ -251,7 +251,7 @@ ModalboxPayment.prototype.createIframe = function (url) {
 	ifrm.allowTransparency = 'true';
 
 	// absolute only for mobile
-	if(this.isMobile()) {
+	if(this._isMobile()) {
 		ifrm.style.position = 'absolute';
 	} else {
 		ifrm.style.position = 'fixed';
@@ -260,7 +260,7 @@ ModalboxPayment.prototype.createIframe = function (url) {
 	return ifrm;
 };
 
-ModalboxPayment.prototype.maximizeIframe = function () {
+ModalboxPayment.prototype._maximizeIframe = function () {
 	this.iframe.style.width = '100%';
 	this.iframe.style.height = '100%';
 	this.iframe.style.left = 0;
@@ -268,7 +268,7 @@ ModalboxPayment.prototype.maximizeIframe = function () {
 	this.iframe.style.marginLeft = 0;
 };
 
-ModalboxPayment.prototype.updateOptions = function (options) {
+ModalboxPayment.prototype._updateOptions = function (options) {
 	if (typeof options  === 'object') {
 		for (var key in options) {
 			this.setOption(key, options[key]);
@@ -276,7 +276,7 @@ ModalboxPayment.prototype.updateOptions = function (options) {
 	}
 };
 
-ModalboxPayment.prototype.createSpinner = function () {
+ModalboxPayment.prototype._createSpinner = function () {
 	var div = this.window.document.createElement('div');
 	div.id = this.spinnerId;
 	div.style.width = '200px';
@@ -294,7 +294,7 @@ ModalboxPayment.prototype.createSpinner = function () {
 	return div;
 };
 
-ModalboxPayment.prototype.createOverlay = function () {
+ModalboxPayment.prototype._createOverlay = function () {
 	var div = this.window.document.createElement('div');
 	div.id = this.overlayId;
 	div.style.display = 'block';
@@ -316,22 +316,7 @@ ModalboxPayment.prototype.createOverlay = function () {
 	return div;
 };
 
-ModalboxPayment.prototype.removeIframe = function () {
-	if (this.iframe) {
-		var elem = this.window.document.getElementById(this.iframeId);
-		elem.parentNode.removeChild(elem);
-		this.removeEvent('message', this.window, this.messageHandler);
-		this.iframe = null;
-		this.visible = false;
-		this.ready = false;
-		this.loaded = false;
-		this.window.ModalboxPayment = null;
-		this.removeOverlay();
-		this._restoreParentViewport();
-	}
-};
-
-ModalboxPayment.prototype.removeOverlay = function () {
+ModalboxPayment.prototype._removeOverlay = function () {
 	if (this.overlay) {
 		var elem = this.window.document.getElementById(this.overlayId);
 		elem.parentNode.removeChild(elem);
@@ -339,7 +324,7 @@ ModalboxPayment.prototype.removeOverlay = function () {
 	}
 };
 
-ModalboxPayment.prototype.removeSpinner = function () {
+ModalboxPayment.prototype._removeSpinner = function () {
 	if (this.spinner) {
 		var elem = this.window.document.getElementById(this.spinnerId);
 		elem.parentNode.removeChild(elem);
@@ -347,26 +332,26 @@ ModalboxPayment.prototype.removeSpinner = function () {
 	}
 };
 
-ModalboxPayment.prototype.showSpinner = function () {
+ModalboxPayment.prototype._showSpinner = function () {
 	if(!this.spinner) {
-		this.spinner = this.createSpinner();
+		this.spinner = this._createSpinner();
 		this.window.document.body.appendChild(this.spinner);
 	}
 };
 
-ModalboxPayment.prototype.showOverlay = function () {
+ModalboxPayment.prototype._showOverlay = function () {
 	if(!this.overlay) {
-		this.overlay = this.createOverlay();
+		this.overlay = this._createOverlay();
 		this.window.document.body.appendChild(this.overlay);
 	}
 };
 
-ModalboxPayment.prototype.getGet = function (sVar) {
+ModalboxPayment.prototype._getGet = function (sVar) {
 	return decodeURI(this.window.location.search.replace(new RegExp('^(?:.*[&\\?]' + encodeURI(sVar).replace(/[\.\+\*]/g, '\\$&') + '(?:\\=([^&]*))?)?.*$', 'i'), '$1'));
 };
 
 // cross-browser event registration
-ModalboxPayment.prototype.addEvent = function (evnt, elem, func) {
+ModalboxPayment.prototype._addEvent = function (evnt, elem, func) {
 	if (elem.addEventListener) {  // W3C DOM
 		elem.addEventListener(evnt, func, false);
 	}
@@ -378,15 +363,15 @@ ModalboxPayment.prototype.addEvent = function (evnt, elem, func) {
 	}
 };
 
-ModalboxPayment.prototype.initSession = function () {
+ModalboxPayment.prototype._initSession = function () {
 	// init lazy loading session
-	this.postMessage(JSON.stringify({
+	this._postMessage(JSON.stringify({
 		type: 'modalbox-init-session'
 	}), this.iframe.contentWindow);
 };
 
 // cross-browser event unregistration
-ModalboxPayment.prototype.removeEvent = function (evnt, elem, func) {
+ModalboxPayment.prototype._removeEvent = function (evnt, elem, func) {
 	if (elem.removeEventListener) {  // W3C DOM
 		elem.removeEventListener(evnt, func, false);
 	}
@@ -399,7 +384,7 @@ ModalboxPayment.prototype.removeEvent = function (evnt, elem, func) {
 };
 
 // get current viewport scale
-ModalboxPayment.prototype.getScale = function () {
+ModalboxPayment.prototype._getScale = function () {
 	this.viewportScale = undefined;
 
 	// Get viewport width
@@ -407,12 +392,12 @@ ModalboxPayment.prototype.getScale = function () {
 
 	// Abort. Screen width is greater than the viewport width (not fullscreen).
 	if (screen.width > viewportWidth) {
-		//this.log('Aborted viewport scale measurement. Screen width > viewport width');
+		//this._log('Aborted viewport scale measurement. Screen width > viewport width');
 		return 1;
 	}
 
 	// Get the orientation corrected screen width
-	this.updateOrientation();
+	this._updateOrientation();
 	this.screenWidth = screen.width;
 
 	if (this.orientation === 'portrait') {
@@ -431,7 +416,7 @@ ModalboxPayment.prototype.getScale = function () {
 };
 
 // updates orientation status
-ModalboxPayment.prototype.updateOrientation = function () {
+ModalboxPayment.prototype._updateOrientation = function () {
 	this.orientation = this.window.orientation;
 
 	if (this.orientation === undefined) {
@@ -463,7 +448,7 @@ ModalboxPayment.prototype._setParentViewport = function () {
 
 		// viewport on gesture for iphones
 		if (navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPad/i)) {
-			this.addEvent('gesturestart', this.window.document.body, function () {
+			this._addEvent('gesturestart', this.window.document.body, function () {
 				viewPortTag.content = 'width=device-width, minimum-scale=0.25, maximum-scale=1.6';
 			});
 		}
@@ -518,27 +503,27 @@ ModalboxPayment.prototype._generateUrl = function (baseUrl, params, config, hash
 		url += '#/' + (hash ? hash : '');
 	}
 
-	//this.log('modalbox URL length: ' + url.length + ' chars');
+	//this._log('modalbox URL length: ' + url.length + ' chars');
 	return url;
 };
 
-ModalboxPayment.prototype.postMessage = function (message, window, origin) {
+ModalboxPayment.prototype._postMessage = function (message, window, origin) {
 	origin = origin ? origin : '*';
 
 	window.postMessage(message, origin);
 };
 
-ModalboxPayment.prototype.log = function (message) {
+ModalboxPayment.prototype._log = function (message) {
 	if (typeof console !== 'undefined' && typeof console.log !== 'undefined') {
 		console.log(message);
 	}
 };
 
-ModalboxPayment.prototype.isMobile = function () {
+ModalboxPayment.prototype._isMobile = function () {
 	return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
 };
 
-ModalboxPayment.prototype.isParentInFrame = function () {
+ModalboxPayment.prototype._isParentInFrame = function () {
 	try {
 		return window.self !== window.top ? 1 : 0;
 	} catch (e) {
@@ -573,8 +558,8 @@ ModalboxPayment.prototype._generateSuccessUrl = function () {
  * @returns {boolean}
  */
 ModalboxPayment.prototype.tryRestore = function () {
-	if (this.getGet('showModalbox') === '1') {
-		this.restore();
+	if (this._getGet('showModalbox') === '1') {
+		this._restore();
 		return true;
 	}
 	return false;
@@ -586,7 +571,7 @@ ModalboxPayment.prototype.tryRestore = function () {
  */
 ModalboxPayment.prototype.init = function (path) {
 	this.view = path || '';
-	this.initIframe(path);
+	this._initIframe(path);
 };
 
 
@@ -597,8 +582,8 @@ ModalboxPayment.prototype.hide = function () {
 	if (this.iframe && this.visible) {
 		this.iframe.style.display = 'none';
 		this._restoreParentViewport();
-		this.removeOverlay();
-		this.removeSpinner();
+		this._removeOverlay();
+		this._removeSpinner();
 		this.visible = false;
 	}
 };
@@ -614,8 +599,8 @@ ModalboxPayment.prototype.sendOptions = function (options) {
 			var params = {};
 			params.type = 'modalbox-update-params';
 			params.options = options;
-			that.postMessage(JSON.stringify(params), that.iframe.contentWindow);
-			that.updateOptions(options);
+			that._postMessage(JSON.stringify(params), that.iframe.contentWindow);
+			that._updateOptions(options);
 		};
 
 		if (that.loaded) {
@@ -709,3 +694,19 @@ ModalboxPayment.prototype.showAmount = function (paytype) {
 ModalboxPayment.prototype.show = function (route) {
 	this._show(route);
 };
+
+ModalboxPayment.prototype.removeIframe = function () {
+	if (this.iframe) {
+		var elem = this.window.document.getElementById(this.iframeId);
+		elem.parentNode.removeChild(elem);
+		this._removeEvent('message', this.window, this._messageHandler);
+		this.iframe = null;
+		this.visible = false;
+		this.ready = false;
+		this.loaded = false;
+		this.window.ModalboxPayment = null;
+		this._removeOverlay();
+		this._restoreParentViewport();
+	}
+};
+
