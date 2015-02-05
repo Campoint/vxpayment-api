@@ -30,6 +30,8 @@ var ModalboxPayment = function (urls, window, options, config, events) {
 	this.window.ModalboxPayment = this;
 };
 
+/********************** Internal setter methods  **************************/
+
 ModalboxPayment.prototype.setOptions = function (options) {
 	this.options = this.options || {};
 
@@ -80,6 +82,10 @@ ModalboxPayment.prototype.setOption = function (key, value) {
 	this.options[key] = value;
 };
 
+/**
+ * postMessage handler
+ * @param evt
+ */
 ModalboxPayment.prototype.messageHandler = function (evt) {
 	var res = null;
 	var modalbox = ModalboxPayment;
@@ -174,25 +180,11 @@ ModalboxPayment.prototype._registerListener = function () {
 	this.addEvent('message', this.window, this.messageHandler);
 };
 
-// tests, whether to restore or not
-ModalboxPayment.prototype.tryRestore = function () {
-	if (this.getGet('showModalbox') === '1') {
-		this.restore();
-		return true;
-	}
-	return false;
-};
-
 // restore Modalbox after previous extern redirect
 ModalboxPayment.prototype.restore = function () {
 	this.view = 'wait';
 	this.initIframe(this.view);
 	this._show();
-};
-
-ModalboxPayment.prototype.init = function (path) {
-	this.view = path || '';
-	this.initIframe(path);
 };
 
 ModalboxPayment.prototype._show = function (path) {
@@ -276,31 +268,6 @@ ModalboxPayment.prototype.maximizeIframe = function () {
 	this.iframe.style.marginLeft = 0;
 };
 
-ModalboxPayment.prototype.sendOptions = function (options) {
-	if (typeof options  === 'object') {
-		var that = this;
-		var sendCallback = function () {
-			var params = {};
-			params.type = 'modalbox-update-params';
-			params.options = options;
-			that.postMessage(JSON.stringify(params), that.iframe.contentWindow);
-			that.updateOptions(options);
-		};
-
-		if (that.loaded) {
-			sendCallback();
-		} else {
-			var intSend = null;
-			intSend = window.setInterval(function () {
-				if (that.loaded) {
-					sendCallback();
-					window.clearInterval(intSend);
-				}
-			}, 500);
-		}
-	}
-};
-
 ModalboxPayment.prototype.updateOptions = function (options) {
 	if (typeof options  === 'object') {
 		for (var key in options) {
@@ -347,16 +314,6 @@ ModalboxPayment.prototype.createOverlay = function () {
 	div.style.position = 'fixed';
 
 	return div;
-};
-
-ModalboxPayment.prototype.hide = function () {
-	if (this.iframe && this.visible) {
-		this.iframe.style.display = 'none';
-		this._restoreParentViewport();
-		this.removeOverlay();
-		this.removeSpinner();
-		this.visible = false;
-	}
 };
 
 ModalboxPayment.prototype.removeIframe = function () {
@@ -609,6 +566,72 @@ ModalboxPayment.prototype._generateSuccessUrl = function () {
 	return url;
 };
 
+/******************* Public methods **************************/
+
+/**
+ * Tries to restore Paytour according to the URL params
+ * @returns {boolean}
+ */
+ModalboxPayment.prototype.tryRestore = function () {
+	if (this.getGet('showModalbox') === '1') {
+		this.restore();
+		return true;
+	}
+	return false;
+};
+
+/**
+ * Initializes Iframe and adds to DOM
+ * @param path
+ */
+ModalboxPayment.prototype.init = function (path) {
+	this.view = path || '';
+	this.initIframe(path);
+};
+
+
+/**
+ * Hides Iframe and overlay on the page, restores viewport
+ */
+ModalboxPayment.prototype.hide = function () {
+	if (this.iframe && this.visible) {
+		this.iframe.style.display = 'none';
+		this._restoreParentViewport();
+		this.removeOverlay();
+		this.removeSpinner();
+		this.visible = false;
+	}
+};
+
+/**
+ * Sends additional parameters to the Paytour through postMessages
+ * @param options
+ */
+ModalboxPayment.prototype.sendOptions = function (options) {
+	if (typeof options  === 'object') {
+		var that = this;
+		var sendCallback = function () {
+			var params = {};
+			params.type = 'modalbox-update-params';
+			params.options = options;
+			that.postMessage(JSON.stringify(params), that.iframe.contentWindow);
+			that.updateOptions(options);
+		};
+
+		if (that.loaded) {
+			sendCallback();
+		} else {
+			var intSend = null;
+			intSend = window.setInterval(function () {
+				if (that.loaded) {
+					sendCallback();
+					window.clearInterval(intSend);
+				}
+			}, 500);
+		}
+	}
+};
+
 /**
  * Opens Modalbox Paytour with preselected paytype
  * @param paytype
@@ -651,6 +674,27 @@ ModalboxPayment.prototype.openLogin = function () {
 };
 
 /**
+ * initialize paytour with default options
+ */
+ModalboxPayment.prototype.initPaytour = function() {
+	this.options.environment = "lp";
+	this.options.flow = "moneycharge";
+
+	if (!this.tryRestore()) {
+		this.init('');
+	}
+};
+
+/**
+ * Open paytour and show given route
+ */
+ModalboxPayment.prototype.showPaytour = function (route) {
+	this._show(route);
+};
+
+/*********************** These methods will soon be removed *******************/
+
+/**
  * @deprecated
  * @param paytype
  */
@@ -664,23 +708,4 @@ ModalboxPayment.prototype.showAmount = function (paytype) {
  */
 ModalboxPayment.prototype.show = function (route) {
 	this._show(route);
-};
-
-/**
- * Open paytour and show given route
- */
-ModalboxPayment.prototype.showPaytour = function (route) {
-	this._show(route);
-};
-
-/**
- * initialize paytour with default options
- */
-ModalboxPayment.prototype.initPaytour = function() {
-	this.options.environment = "lp";
-	this.options.flow = "moneycharge";
-
-	if (!this.tryRestore()) {
-		this.init('');
-	}
 };

@@ -238,7 +238,7 @@ describe('Modalbox JS API Test', function() {
 	});
 
 	/** specials for calling Paytour on LPs */
-	describe('init, tryRestore, initPaytour', function() {
+	describe('common public methods: init, tryRestore, initPaytour', function() {
 		//var msgObject = modalbox._parseMessage(evt.data);
 		var baseUrl = 'https://ph.vxpayment.x/';
 
@@ -279,7 +279,6 @@ describe('Modalbox JS API Test', function() {
 
 	/** Flow tests */
 	describe('existing Flow methods?', function() {
-		//var msgObject = modalbox._parseMessage(evt.data);
 		var baseUrl = 'https://ph.vxpayment.x/';
 
 		var win = {};
@@ -299,4 +298,5 @@ describe('Modalbox JS API Test', function() {
 			expect(typeof modalbox.openChangeCreditcard).toEqual('function');
 		});
 	});
+
 });
