@@ -31,7 +31,7 @@ describe('Modalbox JS API Test', function() {
 		var modalbox = new ModalboxPayment(baseUrl, win, options);
 
 		it('should not be Mobile', function() {
-			expect(modalbox.isMobile()).toBe(false);
+			expect(modalbox._isMobile()).toBe(false);
 		});
 
 		it('should have options set', function() {
@@ -45,7 +45,7 @@ describe('Modalbox JS API Test', function() {
 			expect(modalbox.options.ref).toBe(options.ref);
 			expect(modalbox.options.ruri).toBe(options.ruri);
 			expect(modalbox.options.wt).toBe(options.wt);
-			expect(modalbox.redirectToken).toBe(modalbox.getGet('redirect_token'));
+			expect(modalbox.redirectToken).toBe(modalbox._getGet('redirect_token'));
 			expect(modalbox.options.option).toBe(options.option);
 			expect(modalbox.baseUrl).toBe(baseUrl);
 			expect(modalbox.startUrl).toBe(modalbox.window.location.href);
@@ -255,6 +255,9 @@ describe('Modalbox JS API Test', function() {
 		it('show() method exists?', function() {
 			expect(typeof modalbox.show).toEqual('function');
 		});
+		it('hide() method exists?', function() {
+			expect(typeof modalbox.hide).toEqual('function');
+		});
 		it('sendOptions() method exists?', function() {
 			expect(typeof modalbox.sendOptions).toEqual('function');
 		});
@@ -274,6 +277,9 @@ describe('Modalbox JS API Test', function() {
 			spyOn(modalbox, 'tryRestore');
 			modalbox.initPaytour();
 			expect(modalbox.init).toHaveBeenCalled();
+		});
+		it('old showPaytour() method exists?', function() {
+			expect(typeof modalbox.showPaytour).toEqual('function');
 		});
 	});
 
