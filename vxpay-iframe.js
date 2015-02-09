@@ -50,11 +50,6 @@ ModalboxPayment.prototype.setOptions = function (options) {
 	this.options.flow = options.flow;
 };
 
-ModalboxPayment.prototype.on = function (event, callback) {
-	var eventName = 'on' + event.charAt(0).toUpperCase() + event.slice(1);
-	this[eventName] = callback;
-};
-
 ModalboxPayment.prototype.setConfig = function (config) {
 	this.modConfig = config || {};
 	this.modConfig.parentInFrame = this._isParentInFrame();
@@ -76,8 +71,12 @@ ModalboxPayment.prototype.setUrls = function (urls) {
 ModalboxPayment.prototype.setEvents = function (events) {
 	// events
 	if (typeof events === 'object') {
-		this.onClose = typeof events.onClose === 'function' ? events.onClose : null;
-		this.onSuccess = typeof events.onSuccess === 'function' ? events.onSuccess : null;
+		if (typeof events.onClose === 'function') {
+			this.on('close', events.onClose);
+		}
+		if (typeof events.onSuccess === 'function') {
+			this.on('success', events.onSuccess);
+		}
 	}
 };
 
@@ -680,6 +679,19 @@ ModalboxPayment.prototype.initPaytour = function() {
  */
 ModalboxPayment.prototype.showPaytour = function (route) {
 	this._show(route);
+};
+
+/**
+ * Set callback for given event
+ * e.g.: 'success', 'close'
+ * @param event
+ * @param callback
+ */
+ModalboxPayment.prototype.on = function (event, callback) {
+	if (typeof event === 'string') {
+		var eventName = 'on' + event.charAt(0).toUpperCase() + event.slice(1);
+		this[eventName] = callback;
+	}
 };
 
 /*********************** These methods will soon be removed *******************/
