@@ -77,7 +77,7 @@
 		</exec>
 
 		<replaceregexp file="${basedir}/vxpay-iframe.js"
-					   match="(@version [0-9\.]+)"
+					   match="(@version [0-9\.\-a-z]+)"
 					   replace="@version ${apiVersion}"
 					   byline="true"
 				/>
