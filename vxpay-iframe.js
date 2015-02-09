@@ -50,6 +50,11 @@ ModalboxPayment.prototype.setOptions = function (options) {
 	this.options.flow = options.flow;
 };
 
+ModalboxPayment.prototype.on = function (event, callback) {
+	var eventName = 'on' + event.charAt(0).toUpperCase() + event.slice(1);
+	this[eventName] = callback;
+};
+
 ModalboxPayment.prototype.setConfig = function (config) {
 	this.modConfig = config || {};
 	this.modConfig.parentInFrame = this._isParentInFrame();
