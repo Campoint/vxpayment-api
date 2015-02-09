@@ -128,6 +128,9 @@ ModalboxPayment.prototype._messageHandler = function (evt) {
 			modalbox.onSuccess(msgObject.data);
 			modalbox.hide();
 		} else {
+			// update options
+			modalbox.options.s = typeof msgObject.data === 'object' ? msgObject.data.hostId : modalbox.options.s;
+
 			modalbox.window.location.href = modalbox._generateSuccessUrl();
 			modalbox.hide();
 		}
