@@ -300,6 +300,7 @@ describe('Modalbox JS API Test', function() {
 		it('exist flow methods?', function() {
 			expect(typeof modalbox.openPaytourByPaytype).toEqual('function');
 			expect(typeof modalbox.openLogin).toEqual('function');
+			expect(typeof modalbox.openSignup).toEqual('function');
 			expect(typeof modalbox.openAboPaytour).toEqual('function');
 			expect(typeof modalbox.openChangeCreditcard).toEqual('function');
 			expect(typeof modalbox.logout).toEqual('function');

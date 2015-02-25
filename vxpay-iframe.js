@@ -689,6 +689,15 @@ ModalboxPayment.prototype.openLogin = function () {
 	this.show('login');
 };
 
+/**
+ * Opens Signup in Login Flow
+ */
+ModalboxPayment.prototype.openSignup = function () {
+	this.options.flow = 'login';
+	this.sendOptions({ flow: this.options.flow });
+	this.show('signup');
+};
+
 /** Logout current user */
 ModalboxPayment.prototype.logout = function () {
 	this._sendAction({
