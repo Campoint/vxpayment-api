@@ -558,6 +558,30 @@ ModalboxPayment.prototype._generateSuccessUrl = function () {
 	return url;
 };
 
+/**
+ * Sends action to Paytour
+ */
+ModalboxPayment.prototype._sendAction = function (actionObj) {
+	if (typeof actionObj  === 'object') {
+		var that = this;
+		var sendCallback = function () {
+			that._postMessage(JSON.stringify(actionObj), that.iframe.contentWindow);
+		};
+
+		if (that.loaded) {
+			sendCallback();
+		} else {
+			var intSend = null;
+			intSend = window.setInterval(function () {
+				if (that.loaded) {
+					sendCallback();
+					window.clearInterval(intSend);
+				}
+			}, 500);
+		}
+	}
+};
+
 /******************* Public methods **************************/
 
 /**
@@ -663,6 +687,13 @@ ModalboxPayment.prototype.openLogin = function () {
 	this.options.flow = 'login';
 	this.sendOptions({ flow: this.options.flow });
 	this.show('login');
+};
+
+/** Logout current user */
+ModalboxPayment.prototype.logout = function () {
+	this._sendAction({
+		type: 'modalbox-action-logout'
+	});
 };
 
 /**
