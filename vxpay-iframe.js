@@ -28,6 +28,7 @@ var ModalboxPayment = function (urls, window, options, config, events) {
 	this.loaded = false;
 	this.visible = false;
 	this.window.ModalboxPayment = this;
+	this._responseHandlers = {};
 };
 
 /********************** Internal setter methods  **************************/
@@ -139,6 +140,15 @@ ModalboxPayment.prototype._messageHandler = function (evt) {
 		modalbox._postMessage(JSON.stringify({
 			type: 'modalbox-is-visible'
 		}), modalbox.iframe.contentWindow);
+	}
+	// process action response
+	else if ((res = msgObject.type.match(/^modalbox-response-(.*)/))) {
+		if (typeof modalbox._responseHandlers[res[1]] !== 'undefined') {
+			if (typeof modalbox._responseHandlers[res[1]].resolve === 'function') {
+				modalbox._responseHandlers[res[1]].resolve(msgObject.data);
+			}
+			modalbox._responseHandlers[res[1]] = null;
+		}
 	}
 	// catch transfer_token
 	else if ((res = msgObject.type.match(/^redirect:(.*)/))) {
@@ -584,6 +594,12 @@ ModalboxPayment.prototype._sendAction = function (actionObj) {
 	}
 };
 
+ModalboxPayment.prototype._registerResponseHandler = function (name, resolveCallback) {
+	this._responseHandlers[name] = {
+		resolve: resolveCallback
+	};
+};
+
 /******************* Public methods **************************/
 
 /**
@@ -704,6 +720,15 @@ ModalboxPayment.prototype.openSignup = function () {
 ModalboxPayment.prototype.logout = function () {
 	this._sendAction({
 		type: 'modalbox-action-logout'
+	});
+};
+
+/** Checks if user is logged in and resolves callback */
+ModalboxPayment.prototype.isLoggedIn = function (resolve) {
+	this._registerResponseHandler('isLoggedIn', resolve);
+
+	this._sendAction({
+		type: 'modalbox-action-isLoggedIn'
 	});
 };
 
