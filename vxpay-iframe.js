@@ -200,14 +200,16 @@ ModalboxPayment.prototype._show = function (path) {
 	this._setParentViewport();
 
 	if (!this.ready) {
-		this._showSpinner();
 		this._initIframe(path);
+		window.setTimeout(function() {
+			that._show(path);
+		}, 1000);
+		return false;
 	} else if(typeof path !== 'undefined' && path !== '') {
 		this._changeRoute('/' + path);
 	} else {
 		this._changeRoute(undefined);
 	}
-
 	this.visible = true;
 	this._initSession();
 	this.iframe.style.display = 'block';
