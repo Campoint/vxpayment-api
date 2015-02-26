@@ -694,7 +694,7 @@ ModalboxPayment.prototype.openAboPaytour = function () {
 ModalboxPayment.prototype.openChangeCreditcard = function () {
 	this.options.flow = 'changecc';
 	this.sendOptions({ flow: this.options.flow });
-	this.show('address');
+	this._show('address');
 };
 
 /**
@@ -704,7 +704,7 @@ ModalboxPayment.prototype.openChangeCreditcard = function () {
 ModalboxPayment.prototype.openLogin = function () {
 	this.options.flow = 'login';
 	this.sendOptions({ flow: this.options.flow });
-	this.show('login');
+	this._show('login');
 };
 
 /**
@@ -713,7 +713,7 @@ ModalboxPayment.prototype.openLogin = function () {
 ModalboxPayment.prototype.openSignup = function () {
 	this.options.flow = 'login';
 	this.sendOptions({ flow: this.options.flow });
-	this.show('signup');
+	this._show('signup');
 };
 
 /** Logout current user */
