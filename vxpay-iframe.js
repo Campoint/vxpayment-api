@@ -767,33 +767,9 @@ ModalboxPayment.prototype.on = function (event, callback) {
 /*********************** These methods will soon be removed *******************/
 
 /**
- * @deprecated
- * @param paytype
- */
-ModalboxPayment.prototype.showAmount = function (paytype) {
-	this.openPaytourByPaytype(paytype);
-};
-
-/**
  * Only provided to keep compatibility with older versions
  * @deprecated
  */
 ModalboxPayment.prototype.show = function (route) {
 	this._show(route);
 };
-
-ModalboxPayment.prototype.removeIframe = function () {
-	if (this.iframe) {
-		var elem = this.window.document.getElementById(this.iframeId);
-		elem.parentNode.removeChild(elem);
-		this._removeEvent('message', this.window, this._messageHandler);
-		this.iframe = null;
-		this.visible = false;
-		this.ready = false;
-		this.loaded = false;
-		this.window.ModalboxPayment = null;
-		this._removeOverlay();
-		this._restoreParentViewport();
-	}
-};
-
