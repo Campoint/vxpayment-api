@@ -98,6 +98,11 @@ ModalboxPayment.prototype._messageHandler = function (evt) {
 	// serialized data?
 	var msgObject = modalbox._parseMessage(evt.data);
 
+	// ignore on invalid message
+	if (!msgObject) {
+		return;
+	}
+
 	// on closing modalbox
 	if (msgObject.type === 'modalbox-iframe-close') {
 		modalbox.hide();
@@ -170,6 +175,11 @@ ModalboxPayment.prototype._messageHandler = function (evt) {
 
 ModalboxPayment.prototype._parseMessage = function (evtData) {
 	var obj = {};
+
+	// we don't have valid message format?
+	if (!typeof evtData === 'string') {
+		return;
+	}
 
 	try {
 		// parse event data to JSON object
