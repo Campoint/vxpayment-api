@@ -1,4 +1,4 @@
-/** @version 1.1.4 */
+/** @version 1.1.5 */
 /*jshint strict:false */
 
 /**
@@ -177,7 +177,7 @@ ModalboxPayment.prototype._parseMessage = function (evtData) {
 	var obj = {};
 
 	// we don't have valid message format?
-	if (!typeof evtData === 'string') {
+	if (typeof evtData !== 'string') {
 		return;
 	}
 
@@ -197,7 +197,7 @@ ModalboxPayment.prototype._parseMessage = function (evtData) {
 		obj.data = null;
 	}
 
-	return obj;
+	return (typeof obj.type === 'string') ? obj : null;
 };
 
 // register event listener
