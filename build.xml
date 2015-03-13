@@ -16,6 +16,7 @@
 	<property name="jshint" value="${basedir}/node_modules/.bin/jshint"/>
 	<property name="karma" value="${basedir}/node_modules/karma/bin/karma"/>
 	<property name="dalek" value="${basedir}/node_modules/.bin/dalek"/>
+    <property name="grunt" value="${basedir}/node_modules/.bin/grunt"/>
 
 	<target name="clean" description="Removes build folders and stuff like that">
 		<delete dir="${basedir}/build"/>
@@ -40,7 +41,7 @@
 			<arg value="--comments"/>
 			<arg value="/version/"/>
 			<arg value="-o"/>
-			<arg value="${basedir}/vxpay-iframe.min.js"/>
+			<arg value="${basedir}/vxpay-iframe-api.min.js"/>
 		</exec>
 	</target>
 
@@ -83,7 +84,11 @@
 				/>
 	</target>
 
-	<target name="build" depends="jshint,compressjs,karma,version-tag">
+    <target name="dev-grunt">
+        <exec executable="${grunt}"></exec>
+    </target>
+
+	<target name="build" depends="jshint,compressjs,karma,version-tag,dev-grunt">
 	</target>
 
 	<target name="init" description="Installs all packages for development" depends="dev">

@@ -98,11 +98,6 @@ ModalboxPayment.prototype._messageHandler = function (evt) {
 	// serialized data?
 	var msgObject = modalbox._parseMessage(evt.data);
 
-	// ignore on invalid message
-	if (!msgObject) {
-		return;
-	}
-
 	// on closing modalbox
 	if (msgObject.type === 'modalbox-iframe-close') {
 		modalbox.hide();
@@ -176,11 +171,6 @@ ModalboxPayment.prototype._messageHandler = function (evt) {
 ModalboxPayment.prototype._parseMessage = function (evtData) {
 	var obj = {};
 
-	// we don't have valid message format?
-	if (typeof evtData !== 'string') {
-		return;
-	}
-
 	try {
 		// parse event data to JSON object
 		var json = JSON.parse(evtData);
@@ -197,7 +187,7 @@ ModalboxPayment.prototype._parseMessage = function (evtData) {
 		obj.data = null;
 	}
 
-	return (typeof obj.type === 'string') ? obj : null;
+	return obj;
 };
 
 // register event listener
@@ -221,6 +211,7 @@ ModalboxPayment.prototype._show = function (path) {
 
 	if (!this.ready) {
 		this._initIframe(path);
+		this._showSpinner();
 		window.setTimeout(function() {
 			that._show(path);
 		}, 1000);
@@ -308,18 +299,31 @@ ModalboxPayment.prototype._updateOptions = function (options) {
 ModalboxPayment.prototype._createSpinner = function () {
 	var div = this.window.document.createElement('div');
 	div.id = this.spinnerId;
-	div.style.width = '200px';
-	div.style.height = '200px';
-	div.style.lineHeight = '200px';
-	div.style.top = '15%';
-	div.style.left = '50%';
-	div.style.marginLeft = '-100px';
-	div.style.zIndex = 10002;
-	div.style.position = 'absolute';
-	div.style.background = '#FFFFFF';
-	div.style.textAlign = 'center';
-	div.innerHTML = '<img alt="spinner" src="https://www.visit-x.net/VXPAY/img/spinner.gif" style="vertical-align: middle;" />';
 
+	div.style.cssText = 'position:  absolute;' +
+	'width: 140px;' +
+	'height: 140px;' +
+	'background: #000;' +
+	'-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=10)";' +
+	'background: rgba(0,0,0,0.9);' +
+	'left: 50%;' +
+	'top: 50%;' +
+	'margin-top: -70px;' +
+	'margin-left: -70px;' +
+	'opacity: 0.6;' +
+	'border-radius: 15px;' +
+	'z-index: 100000;';
+
+	var opts = {
+		color: '#fff',
+		radius:30,
+		lines: 17,
+		length: 17,
+		width: 7,
+		hwaccel: true
+	};
+
+	var spinner = new Spinner(opts).spin(div);
 	return div;
 };
 
@@ -327,7 +331,7 @@ ModalboxPayment.prototype._createOverlay = function () {
 	var div = this.window.document.createElement('div');
 	div.id = this.overlayId;
 	div.style.display = 'block';
-	div.style.opacity = '0.5';
+	div.style.opacity = '0.3';
 	div.style.background = '#000000';
 
 	/* ie8 opacity */
