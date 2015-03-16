@@ -35,6 +35,11 @@
 	</target>
 
 	<!-- Release Tasks -->
+	<target name="deleteBuild" description="Deletes generated versions">
+		<delete file="${basedir}/vxpay-iframe-api.min.js"/>
+		<delete file="${basedir}/vxpay-iframe.min.js"/>
+	</target>
+
 	<target name="compressjs" description="Compresses the JS Files">
 		<exec dir="${basedir}" executable="uglifyjs">
 			<arg value="${basedir}/vxpay-iframe.js"/>
@@ -71,10 +76,9 @@
 	</target>
 
 	<target name="version-tag">
-		<exec executable="git" resolveexecutable="true" outputproperty="apiVersion">
-			<arg value="describe"/>
-			<arg value="--tags"/>
-			<arg value="master"/>
+		<exec executable="node" resolveexecutable="true" outputproperty="apiVersion">
+			<arg value="-e"/>
+			<arg value="console.log(require('${basedir}/package.json').version);"/>
 		</exec>
 
 		<replaceregexp file="${basedir}/vxpay-iframe.js"
@@ -88,7 +92,7 @@
         <exec executable="${grunt}"></exec>
     </target>
 
-	<target name="build" depends="jshint,compressjs,karma,version-tag,dev-grunt">
+	<target name="build" depends="jshint,deleteBuild,version-tag,compressjs,karma,dev-grunt">
 	</target>
 
 	<target name="init" description="Installs all packages for development" depends="dev">
