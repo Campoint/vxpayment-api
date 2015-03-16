@@ -51,6 +51,21 @@
 	</target>
 
 	<target name="dev" description="Installs all packages for development" depends="dev-npm">
+		<exec executable="ln">
+			<arg value="-s"/>
+			<arg path="${basedir}/vxpay-iframe.js"/>
+			<arg path="${basedir}/http-root/vxpay-iframe.js"/>
+		</exec>
+		<exec executable="ln">
+			<arg value="-s"/>
+			<arg path="${basedir}/vxpay-iframe.min.js"/>
+			<arg path="${basedir}/http-root/vxpay-iframe.min.js"/>
+		</exec>
+		<exec executable="ln">
+			<arg value="-s"/>
+			<arg path="${basedir}/spin.min.js"/>
+			<arg path="${basedir}/http-root/spin.min.js"/>
+		</exec>
 	</target>
 
 	<target name="dev-npm">
