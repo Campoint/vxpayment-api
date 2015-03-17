@@ -717,8 +717,8 @@ ModalboxPayment.prototype.openAboPaytour = function () {
  */
 ModalboxPayment.prototype.openChangeCreditcard = function () {
 	this.options.flow = 'changecc';
-	this.sendOptions({ flow: this.options.flow });
-	this._show('address');
+	this.sendOptions({ flow: this.options.flow, paytype: 'CC' });
+	this._show();
 };
 
 /**
