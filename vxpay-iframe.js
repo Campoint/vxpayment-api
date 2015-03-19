@@ -1,4 +1,4 @@
-/** @version 1.1.8 */
+/** @version 1.1.9 */
 /*jshint strict:false */
 
 /**
@@ -234,6 +234,8 @@ ModalboxPayment.prototype._show = function (path) {
 	this.visible = true;
 	this._initSession();
 	this.iframe.style.display = 'block';
+	this.window.document.body.style.overflow = 'hidden';
+
 
 	// scroll parent to top - for mobiles
 	this.window.scrollTo(0,1);
@@ -654,6 +656,7 @@ ModalboxPayment.prototype.init = function (path) {
 ModalboxPayment.prototype.hide = function () {
 	if (this.iframe && this.visible) {
 		this.iframe.style.display = 'none';
+		this.window.document.body.style.overflow = 'auto';
 		this._restoreParentViewport();
 		this._removeOverlay();
 		this._removeSpinner();
