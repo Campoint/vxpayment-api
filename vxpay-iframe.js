@@ -282,6 +282,12 @@ ModalboxPayment.prototype._createIframe = function (url) {
 	// allow transparent iframe for <= IE8
 	ifrm.allowTransparency = 'true';
 
+	if (this._supportsStyleAttr(ifrm, 'maxHeight', '100vh')) {
+		ifrm.style.maxHeight = '100vh';
+	} else {
+		ifrm.style.maxHeight = '480px';
+	}
+
 	// absolute only for mobile
 	if(this._isMobile()) {
 		ifrm.style.position = 'absolute';
@@ -290,6 +296,20 @@ ModalboxPayment.prototype._createIframe = function (url) {
 	}
 
 	return ifrm;
+};
+
+ModalboxPayment.prototype._supportsStyleAttr = function (elem, attribute, val){
+	var supports = false;
+
+	try {
+		elem.style[attribute] = val;
+
+		if(elem.style[attribute] === val){
+			supports = true;
+		}
+	} catch(e){}
+
+	return supports;
 };
 
 ModalboxPayment.prototype._maximizeIframe = function () {
