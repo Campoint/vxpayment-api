@@ -1,4 +1,4 @@
-/** @version 1.1.10 */
+/** @version 1.1.11 */
 /*jshint strict:false */
 
 /**
@@ -285,7 +285,9 @@ ModalboxPayment.prototype._createIframe = function (url) {
 	if (this._supportsStyleAttr(ifrm, 'maxHeight', '100vh')) {
 		ifrm.style.maxHeight = '100vh';
 	} else {
-		ifrm.style.maxHeight = '480px';
+		if(this._isMobile()) {
+			ifrm.style.maxHeight = '480px';
+		}
 	}
 
 	// absolute only for mobile
