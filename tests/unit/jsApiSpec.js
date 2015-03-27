@@ -108,6 +108,9 @@ describe('Modalbox JS API Test', function() {
 		var events = {
 			onSuccess: function () {
 				return true;
+			},
+			onReady: function () {
+				return true;
 			}
 		};
 
@@ -130,6 +133,7 @@ describe('Modalbox JS API Test', function() {
 		it('callbacks set?', function() {
 			expect(typeof modalbox.onSuccess).toEqual('function');
 			expect(typeof modalbox.onClose).toEqual('function');
+			expect(typeof modalbox.onReady).toEqual('function');
 		});
 		it('callback overwritten?', function() {
 			expect(modalbox.onClose()).toEqual('over');

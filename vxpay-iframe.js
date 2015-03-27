@@ -1,4 +1,4 @@
-/** @version 1.1.11 */
+/** @version 1.1.12 */
 /*jshint strict:false */
 
 /**
@@ -78,6 +78,9 @@ ModalboxPayment.prototype.setEvents = function (events) {
 		if (typeof events.onSuccess === 'function') {
 			this.on('success', events.onSuccess);
 		}
+		if (typeof events.onReady === 'function') {
+			this.on('ready', events.onReady);
+		}
 	}
 };
 
@@ -116,6 +119,13 @@ ModalboxPayment.prototype._messageHandler = function (evt) {
 		modalbox.ready = true;
 		modalbox._removeSpinner();
 		modalbox._maximizeIframe();
+
+		// onReady callback
+		if (typeof modalbox.onReady === 'function') {
+			modalbox.onReady({
+				modalbox: modalbox
+			});
+		}
 	}
 	else if (msgObject.type === 'modalbox-content-loaded') {
 		modalbox.loaded = true;
