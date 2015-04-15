@@ -1,4 +1,4 @@
-/** @version 1.1.12 */
+/** @version 1.1.13 */
 /*jshint strict:false */
 
 /**
@@ -722,6 +722,21 @@ ModalboxPayment.prototype.sendOptions = function (options) {
 				}
 			}, 500);
 		}
+	}
+};
+
+/**
+ * Open paytour in MoneyCharge flow and show given route
+ */
+ModalboxPayment.prototype.openPaytour = function (route) {
+	var flow = 'moneycharge'; /** TODO: Move into business logic **/
+	if (this.options.flow !== flow) {
+		this.options.flow = flow;
+		this.sendOptions({ flow: this.options.flow });
+
+		this._show(route ? route : 'payment');
+	} else {
+		this._show(route);
 	}
 };
 
