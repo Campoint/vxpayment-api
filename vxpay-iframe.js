@@ -112,7 +112,7 @@ ModalboxPayment.prototype._messageHandler = function (evt) {
 
 		// onClose callback
 		if (typeof modalbox.onClose === 'function') {
-			modalbox.onClose();
+			modalbox.onClose(msgObject.data);
 		}
 	}
 	else if (msgObject.type === 'modalbox-iframe-ready') {
