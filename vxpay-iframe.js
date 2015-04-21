@@ -1,4 +1,4 @@
-/** @version 1.1.14 */
+/** @version 1.1.15 */
 /*jshint strict:false */
 
 /**
@@ -623,6 +623,12 @@ ModalboxPayment.prototype._generateSuccessUrl = function () {
 	}
 	if (this.options.pfm) {
 		url += (url.indexOf('?') >= 0 ? '&' : '?') + 'xpfm=' + encodeURIComponent(this.options.pfm);
+	}
+	if (this.options.w) {
+		url += (url.indexOf('?') >= 0 ? '&' : '?') + 'w=' + encodeURIComponent(this.options.w);
+	}
+	if (this.options.ws) {
+		url += (url.indexOf('?') >= 0 ? '&' : '?') + 'ws=' + encodeURIComponent(this.options.ws);
 	}
 
 	return url;

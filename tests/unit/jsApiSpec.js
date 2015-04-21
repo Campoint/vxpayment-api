@@ -28,6 +28,7 @@ describe('Modalbox JS API Test', function() {
 		win.parent.document = {};
 		win.parent.document.body = { clientWidth: 1000 };
 
+
 		var modalbox = new ModalboxPayment(baseUrl, win, options);
 
 		it('should not be Mobile', function() {
@@ -52,8 +53,23 @@ describe('Modalbox JS API Test', function() {
 			expect(modalbox.window.ModalboxPayment).toBe(modalbox);
 		});
 
+		var hostUrlRegex = 'http:\/\/www.visit\-x\.net\/CAMS\/DE\/Darsteller\/' + options.host + '\/';
+
 		it('is success URL correct?', function() {
-			expect(modalbox._generateSuccessUrl()).toMatch(new RegExp('http:\/\/www.visit\-x\.net\/CAMS\/DE\/Darsteller\/' + options.host, 'i'));
+			expect(modalbox._generateSuccessUrl()).toMatch(new RegExp(hostUrlRegex, 'i'));
+		});
+		it('w in URL?', function() {
+			expect(modalbox._generateSuccessUrl()).toMatch(new RegExp(hostUrlRegex + '.*w=' + options.w, 'i'));
+		});
+		it('ws in URL?', function() {
+			expect(modalbox._generateSuccessUrl()).toMatch(new RegExp(hostUrlRegex + '.*ws=' + options.ws, 'i'));
+		});
+		it('w,ws not in URL?', function() {
+			modalbox.options.w = undefined;
+			modalbox.options.ws = undefined;
+
+			expect(modalbox._generateSuccessUrl()).not.toMatch(new RegExp(hostUrlRegex + '.*w=' + options.w, 'i'));
+			expect(modalbox._generateSuccessUrl()).not.toMatch(new RegExp(hostUrlRegex + '.*ws=' + options.ws, 'i'));
 		});
 	});
 
