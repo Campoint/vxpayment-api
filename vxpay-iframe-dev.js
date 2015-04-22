@@ -1,0 +1,1204 @@
+/**
+ * Copyright (c) 2011-2014 Felix Gnass
+ * Licensed under the MIT license
+ */
+(function(root, factory) {
+
+  /* CommonJS */
+  if (typeof exports == 'object')  module.exports = factory()
+
+  /* AMD module */
+  else if (typeof define == 'function' && define.amd) define(factory)
+
+  /* Browser global */
+  else root.Spinner = factory()
+}
+(this, function() {
+  "use strict";
+
+  var prefixes = ['webkit', 'Moz', 'ms', 'O'] /* Vendor prefixes */
+    , animations = {} /* Animation rules keyed by their name */
+    , useCssAnimations /* Whether to use CSS animations or setTimeout */
+
+  /**
+   * Utility function to create elements. If no tag name is given,
+   * a DIV is created. Optionally properties can be passed.
+   */
+  function createEl(tag, prop) {
+    var el = document.createElement(tag || 'div')
+      , n
+
+    for(n in prop) el[n] = prop[n]
+    return el
+  }
+
+  /**
+   * Appends children and returns the parent.
+   */
+  function ins(parent /* child1, child2, ...*/) {
+    for (var i=1, n=arguments.length; i<n; i++)
+      parent.appendChild(arguments[i])
+
+    return parent
+  }
+
+  /**
+   * Insert a new stylesheet to hold the @keyframe or VML rules.
+   */
+  var sheet = (function() {
+    var el = createEl('style', {type : 'text/css'})
+    ins(document.getElementsByTagName('head')[0], el)
+    return el.sheet || el.styleSheet
+  }())
+
+  /**
+   * Creates an opacity keyframe animation rule and returns its name.
+   * Since most mobile Webkits have timing issues with animation-delay,
+   * we create separate rules for each line/segment.
+   */
+  function addAnimation(alpha, trail, i, lines) {
+    var name = ['opacity', trail, ~~(alpha*100), i, lines].join('-')
+      , start = 0.01 + i/lines * 100
+      , z = Math.max(1 - (1-alpha) / trail * (100-start), alpha)
+      , prefix = useCssAnimations.substring(0, useCssAnimations.indexOf('Animation')).toLowerCase()
+      , pre = prefix && '-' + prefix + '-' || ''
+
+    if (!animations[name]) {
+      sheet.insertRule(
+        '@' + pre + 'keyframes ' + name + '{' +
+        '0%{opacity:' + z + '}' +
+        start + '%{opacity:' + alpha + '}' +
+        (start+0.01) + '%{opacity:1}' +
+        (start+trail) % 100 + '%{opacity:' + alpha + '}' +
+        '100%{opacity:' + z + '}' +
+        '}', sheet.cssRules.length)
+
+      animations[name] = 1
+    }
+
+    return name
+  }
+
+  /**
+   * Tries various vendor prefixes and returns the first supported property.
+   */
+  function vendor(el, prop) {
+    var s = el.style
+      , pp
+      , i
+
+    prop = prop.charAt(0).toUpperCase() + prop.slice(1)
+    for(i=0; i<prefixes.length; i++) {
+      pp = prefixes[i]+prop
+      if(s[pp] !== undefined) return pp
+    }
+    if(s[prop] !== undefined) return prop
+  }
+
+  /**
+   * Sets multiple style properties at once.
+   */
+  function css(el, prop) {
+    for (var n in prop)
+      el.style[vendor(el, n)||n] = prop[n]
+
+    return el
+  }
+
+  /**
+   * Fills in default values.
+   */
+  function merge(obj) {
+    for (var i=1; i < arguments.length; i++) {
+      var def = arguments[i]
+      for (var n in def)
+        if (obj[n] === undefined) obj[n] = def[n]
+    }
+    return obj
+  }
+
+  /**
+   * Returns the absolute page-offset of the given element.
+   */
+  function pos(el) {
+    var o = { x:el.offsetLeft, y:el.offsetTop }
+    while((el = el.offsetParent))
+      o.x+=el.offsetLeft, o.y+=el.offsetTop
+
+    return o
+  }
+
+  /**
+   * Returns the line color from the given string or array.
+   */
+  function getColor(color, idx) {
+    return typeof color == 'string' ? color : color[idx % color.length]
+  }
+
+  // Built-in defaults
+
+  var defaults = {
+    lines: 12,            // The number of lines to draw
+    length: 7,            // The length of each line
+    width: 5,             // The line thickness
+    radius: 10,           // The radius of the inner circle
+    rotate: 0,            // Rotation offset
+    corners: 1,           // Roundness (0..1)
+    color: '#000',        // #rgb or #rrggbb
+    direction: 1,         // 1: clockwise, -1: counterclockwise
+    speed: 1,             // Rounds per second
+    trail: 100,           // Afterglow percentage
+    opacity: 1/4,         // Opacity of the lines
+    fps: 20,              // Frames per second when using setTimeout()
+    zIndex: 2e9,          // Use a high z-index by default
+    className: 'spinner', // CSS class to assign to the element
+    top: '50%',           // center vertically
+    left: '50%',          // center horizontally
+    position: 'absolute'  // element position
+  }
+
+  /** The constructor */
+  function Spinner(o) {
+    this.opts = merge(o || {}, Spinner.defaults, defaults)
+  }
+
+  // Global defaults that override the built-ins:
+  Spinner.defaults = {}
+
+  merge(Spinner.prototype, {
+
+    /**
+     * Adds the spinner to the given target element. If this instance is already
+     * spinning, it is automatically removed from its previous target b calling
+     * stop() internally.
+     */
+    spin: function(target) {
+      this.stop()
+
+      var self = this
+        , o = self.opts
+        , el = self.el = css(createEl(0, {className: o.className}), {position: o.position, width: 0, zIndex: o.zIndex})
+        , mid = o.radius+o.length+o.width
+
+      css(el, {
+        left: o.left,
+        top: o.top
+      })
+        
+      if (target) {
+        target.insertBefore(el, target.firstChild||null)
+      }
+
+      el.setAttribute('role', 'progressbar')
+      self.lines(el, self.opts)
+
+      if (!useCssAnimations) {
+        // No CSS animation support, use setTimeout() instead
+        var i = 0
+          , start = (o.lines - 1) * (1 - o.direction) / 2
+          , alpha
+          , fps = o.fps
+          , f = fps/o.speed
+          , ostep = (1-o.opacity) / (f*o.trail / 100)
+          , astep = f/o.lines
+
+        ;(function anim() {
+          i++;
+          for (var j = 0; j < o.lines; j++) {
+            alpha = Math.max(1 - (i + (o.lines - j) * astep) % f * ostep, o.opacity)
+
+            self.opacity(el, j * o.direction + start, alpha, o)
+          }
+          self.timeout = self.el && setTimeout(anim, ~~(1000/fps))
+        })()
+      }
+      return self
+    },
+
+    /**
+     * Stops and removes the Spinner.
+     */
+    stop: function() {
+      var el = this.el
+      if (el) {
+        clearTimeout(this.timeout)
+        if (el.parentNode) el.parentNode.removeChild(el)
+        this.el = undefined
+      }
+      return this
+    },
+
+    /**
+     * Internal method that draws the individual lines. Will be overwritten
+     * in VML fallback mode below.
+     */
+    lines: function(el, o) {
+      var i = 0
+        , start = (o.lines - 1) * (1 - o.direction) / 2
+        , seg
+
+      function fill(color, shadow) {
+        return css(createEl(), {
+          position: 'absolute',
+          width: (o.length+o.width) + 'px',
+          height: o.width + 'px',
+          background: color,
+          boxShadow: shadow,
+          transformOrigin: 'left',
+          transform: 'rotate(' + ~~(360/o.lines*i+o.rotate) + 'deg) translate(' + o.radius+'px' +',0)',
+          borderRadius: (o.corners * o.width>>1) + 'px'
+        })
+      }
+
+      for (; i < o.lines; i++) {
+        seg = css(createEl(), {
+          position: 'absolute',
+          top: 1+~(o.width/2) + 'px',
+          transform: o.hwaccel ? 'translate3d(0,0,0)' : '',
+          opacity: o.opacity,
+          animation: useCssAnimations && addAnimation(o.opacity, o.trail, start + i * o.direction, o.lines) + ' ' + 1/o.speed + 's linear infinite'
+        })
+
+        if (o.shadow) ins(seg, css(fill('#000', '0 0 4px ' + '#000'), {top: 2+'px'}))
+        ins(el, ins(seg, fill(getColor(o.color, i), '0 0 1px rgba(0,0,0,.1)')))
+      }
+      return el
+    },
+
+    /**
+     * Internal method that adjusts the opacity of a single line.
+     * Will be overwritten in VML fallback mode below.
+     */
+    opacity: function(el, i, val) {
+      if (i < el.childNodes.length) el.childNodes[i].style.opacity = val
+    }
+
+  })
+
+
+  function initVML() {
+
+    /* Utility function to create a VML tag */
+    function vml(tag, attr) {
+      return createEl('<' + tag + ' xmlns="urn:schemas-microsoft.com:vml" class="spin-vml">', attr)
+    }
+
+    // No CSS transforms but VML support, add a CSS rule for VML elements:
+    sheet.addRule('.spin-vml', 'behavior:url(#default#VML)')
+
+    Spinner.prototype.lines = function(el, o) {
+      var r = o.length+o.width
+        , s = 2*r
+
+      function grp() {
+        return css(
+          vml('group', {
+            coordsize: s + ' ' + s,
+            coordorigin: -r + ' ' + -r
+          }),
+          { width: s, height: s }
+        )
+      }
+
+      var margin = -(o.width+o.length)*2 + 'px'
+        , g = css(grp(), {position: 'absolute', top: margin, left: margin})
+        , i
+
+      function seg(i, dx, filter) {
+        ins(g,
+          ins(css(grp(), {rotation: 360 / o.lines * i + 'deg', left: ~~dx}),
+            ins(css(vml('roundrect', {arcsize: o.corners}), {
+                width: r,
+                height: o.width,
+                left: o.radius,
+                top: -o.width>>1,
+                filter: filter
+              }),
+              vml('fill', {color: getColor(o.color, i), opacity: o.opacity}),
+              vml('stroke', {opacity: 0}) // transparent stroke to fix color bleeding upon opacity change
+            )
+          )
+        )
+      }
+
+      if (o.shadow)
+        for (i = 1; i <= o.lines; i++)
+          seg(i, -2, 'progid:DXImageTransform.Microsoft.Blur(pixelradius=2,makeshadow=1,shadowopacity=.3)')
+
+      for (i = 1; i <= o.lines; i++) seg(i)
+      return ins(el, g)
+    }
+
+    Spinner.prototype.opacity = function(el, i, val, o) {
+      var c = el.firstChild
+      o = o.shadow && o.lines || 0
+      if (c && i+o < c.childNodes.length) {
+        c = c.childNodes[i+o]; c = c && c.firstChild; c = c && c.firstChild
+        if (c) c.opacity = val
+      }
+    }
+  }
+
+  var probe = css(createEl('group'), {behavior: 'url(#default#VML)'})
+
+  if (!vendor(probe, 'transform') && probe.adj) initVML()
+  else useCssAnimations = vendor(probe, 'animation')
+
+  return Spinner
+
+}));
+;/** @version 1.1.15 */
+/*jshint strict:false */
+
+/**
+ * ModalboxPayment - JS Api for Payment
+ * - needs to be compressed after each change to this file
+ *
+ * @author ph
+ */
+var ModalboxPayment = function (urls, window, options, config, events) {
+	this.window = window;
+	this.transferToken = '';
+	this.redirectToken = options.tt || this._getGet('redirect_token');
+
+	this.setUrls(urls);
+	this.setOptions(options);
+	this.setConfig(config);
+	this.setEvents(events);
+
+	this.iframeId = 'modalboxiframe';
+	this.overlayId = this.iframeId + 'Overlay';
+	this.spinnerId = this.iframeId + 'Spinner';
+
+	// save viewport scale on start
+	this.origScale = this._getScale();
+	this.view = '';
+	this.ready = false;
+	this.loaded = false;
+	this.visible = false;
+	this.window.ModalboxPayment = this;
+	this._responseHandlers = {};
+};
+
+/********************** Internal setter methods  **************************/
+
+ModalboxPayment.prototype.setOptions = function (options) {
+	this.options = this.options || {};
+
+	this.options.aurl = options.agbUrl;
+	this.options.pfm = options.pfm;
+	this.options.s = options.host;
+	this.options.simg = options.hostImg;
+	this.options.w = options.w;
+	this.options.ws = options.ws;
+	this.options.ref = options.ref;
+	this.options.ruri = options.ruri;
+	this.options.wt = options.wt;
+	this.options.option = options.option;
+	this.options.lang = options.lang;
+	this.options.environment = options.environment;
+	this.options.flow = options.flow;
+};
+
+ModalboxPayment.prototype.setConfig = function (config) {
+	this.modConfig = config || {};
+	this.modConfig.parentInFrame = this._isParentInFrame();
+};
+
+ModalboxPayment.prototype.setUrls = function (urls) {
+	this.startUrl = this.window.location.href;
+	this.succesUrl = 'http://www.visit-x.net/';
+
+	// only baseUrl?
+	if (typeof urls === 'string') {
+		this.baseUrl = urls;
+	} else if (typeof urls === 'object') { /* we have a list of URLS? */
+		this.baseUrl = urls.baseUrl;
+		this.succesUrl = urls.successUrl || this.succesUrl;
+	}
+};
+
+ModalboxPayment.prototype.setEvents = function (events) {
+	// events
+	if (typeof events === 'object') {
+		if (typeof events.onClose === 'function') {
+			this.on('close', events.onClose);
+		}
+		if (typeof events.onSuccess === 'function') {
+			this.on('success', events.onSuccess);
+		}
+		if (typeof events.onReady === 'function') {
+			this.on('ready', events.onReady);
+		}
+	}
+};
+
+ModalboxPayment.prototype.setOption = function (key, value) {
+	this.options = this.options || {};
+
+	this.options[key] = value;
+};
+
+/**
+ * postMessage handler
+ * @param evt
+ */
+ModalboxPayment.prototype._messageHandler = function (evt) {
+	var res = null;
+	var modalbox = ModalboxPayment;
+
+	// serialized data?
+	var msgObject = modalbox._parseMessage(evt.data);
+
+	// ignore on invalid message
+	if (!msgObject) {
+		return;
+	}
+
+	// on closing modalbox
+	if (msgObject.type === 'modalbox-iframe-close') {
+		modalbox.hide();
+
+		// onClose callback
+		if (typeof modalbox.onClose === 'function') {
+			modalbox.onClose(msgObject.data);
+		}
+	}
+	else if (msgObject.type === 'modalbox-iframe-ready') {
+		modalbox.ready = true;
+		modalbox._removeSpinner();
+		modalbox._maximizeIframe();
+
+		// onReady callback
+		if (typeof modalbox.onReady === 'function') {
+			modalbox.onReady({
+				modalbox: modalbox
+			});
+		}
+	}
+	else if (msgObject.type === 'modalbox-content-loaded') {
+		modalbox.loaded = true;
+		if (modalbox.visible) {
+			modalbox._initSession();
+
+			modalbox._postMessage(JSON.stringify({
+				type: 'modalbox-is-visible'
+			}), modalbox.iframe.contentWindow);
+		}
+	}
+	// on finished paytour
+	else if (msgObject.type === 'modalbox-success') {
+		//modalbox._log('Paytour success');
+		if (typeof modalbox.onSuccess === 'function') {
+			modalbox.onSuccess(msgObject.data);
+			modalbox.hide();
+		} else {
+			// update options
+			modalbox.options.s = typeof msgObject.data === 'object' ? msgObject.data.hostId : modalbox.options.s;
+
+			modalbox.window.location.href = modalbox._generateSuccessUrl();
+			modalbox.hide();
+		}
+	}
+	else if (msgObject.type === 'modalbox-view-ready') {
+		modalbox._postMessage(JSON.stringify({
+			type: 'modalbox-is-visible'
+		}), modalbox.iframe.contentWindow);
+	}
+	// process action response
+	else if ((res = msgObject.type.match(/^modalbox-response-(.*)/))) {
+		if (typeof modalbox._responseHandlers[res[1]] !== 'undefined') {
+			if (typeof modalbox._responseHandlers[res[1]].resolve === 'function') {
+				modalbox._responseHandlers[res[1]].resolve(msgObject.data);
+			}
+			modalbox._responseHandlers[res[1]] = null;
+		}
+	}
+	// catch transfer_token
+	else if ((res = msgObject.type.match(/^redirect:(.*)/))) {
+		modalbox.window.location.href = res[1];
+	}
+	// catch transfer_token
+	else if ((res = msgObject.type.match(/^transfer_token:(.*)/))) {
+		modalbox.transferToken = res[1];
+
+		// send additional parameters back
+		//modalbox._log('updating session');
+		modalbox._postMessage(JSON.stringify({
+			type: 'modalbox-additional-info',
+			ref: modalbox.options.ref,
+			ruri: modalbox.options.ruri
+		}), modalbox.iframe.contentWindow);
+	}
+};
+
+ModalboxPayment.prototype._parseMessage = function (evtData) {
+	var obj = {};
+
+	// we don't have valid message format?
+	if (typeof evtData !== 'string') {
+		return;
+	}
+
+	try {
+		// parse event data to JSON object
+		var json = JSON.parse(evtData);
+
+		if (typeof json === 'object') {
+			obj.type = json.type;
+			obj.data = json.data;
+		} else {
+			obj.type = evtData;
+			obj.data = null;
+		}
+	} catch (e) {
+		obj.type = evtData;
+		obj.data = null;
+	}
+
+	return (typeof obj.type === 'string') ? obj : null;
+};
+
+// register event listener
+ModalboxPayment.prototype._registerListener = function () {
+	var that = this;
+
+	this._addEvent('message', this.window, this._messageHandler);
+};
+
+// restore Modalbox after previous extern redirect
+ModalboxPayment.prototype._restore = function () {
+	this.view = 'wait';
+	this._initIframe(this.view);
+	this._show();
+};
+
+ModalboxPayment.prototype._show = function (path) {
+	var that = this;
+	this._showOverlay();
+	this._setParentViewport();
+
+	if (!this.ready) {
+		this._initIframe(path);
+		this._showSpinner();
+		window.setTimeout(function() {
+			that._show(path);
+		}, 1000);
+		return false;
+	} else if(typeof path !== 'undefined' && path !== '') {
+		this._changeRoute('/' + path);
+	} else {
+		this._changeRoute(undefined);
+	}
+	this.visible = true;
+	this._initSession();
+	this.iframe.style.display = 'block';
+	this.window.document.body.style.overflow = 'hidden';
+
+
+	// scroll parent to top - for mobiles
+	this.window.scrollTo(0,1);
+};
+
+ModalboxPayment.prototype._changeRoute = function (route) {
+	this._postMessage(JSON.stringify({
+		type: 'modalbox-change-route',
+		route: route
+	}), this.iframe.contentWindow);
+};
+
+ModalboxPayment.prototype._initIframe = function (path) {
+	if (!this.iframe) {
+		this._registerListener();
+
+		var opts = this.options;
+		opts.surl = this.startUrl;
+		opts.tt = this.redirectToken;
+		opts.sview = this.view;
+		opts.lazy = 1;
+
+		// create URL with params
+		var url = this._generateUrl(this.baseUrl, opts, this.modConfig, (path ? path : ''));
+
+		this.iframe = this._createIframe(url);
+
+		this.window.document.body.appendChild(this.iframe);
+	}
+};
+
+ModalboxPayment.prototype._createIframe = function (url) {
+	var ifrm = this.window.document.createElement('iframe');
+	ifrm.src = url;
+	ifrm.id = this.iframeId;
+	ifrm.style.border = 'none';
+	ifrm.style.width = '675px';
+	ifrm.style.height = '740px';
+	ifrm.style.top = '5%';
+	ifrm.style.left = '50%';
+	ifrm.style.marginLeft = '-325px';
+	ifrm.style.zIndex = 10001;
+	ifrm.style.display = 'none';
+	// allow transparent iframe for <= IE8
+	ifrm.allowTransparency = 'true';
+
+	if (this._supportsStyleAttr(ifrm, 'maxHeight', '100vh')) {
+		ifrm.style.maxHeight = '100vh';
+	} else {
+		if(this._isMobile()) {
+			ifrm.style.maxHeight = '480px';
+		}
+	}
+
+	// absolute only for mobile
+	if(this._isMobile()) {
+		ifrm.style.position = 'absolute';
+	} else {
+		ifrm.style.position = 'fixed';
+	}
+
+	return ifrm;
+};
+
+ModalboxPayment.prototype._supportsStyleAttr = function (elem, attribute, val){
+	var supports = false;
+
+	try {
+		elem.style[attribute] = val;
+
+		if(elem.style[attribute] === val){
+			supports = true;
+		}
+	} catch(e){}
+
+	return supports;
+};
+
+ModalboxPayment.prototype._maximizeIframe = function () {
+	this.iframe.style.width = '100%';
+	this.iframe.style.height = '100%';
+	this.iframe.style.left = 0;
+	this.iframe.style.top = 0;
+	this.iframe.style.marginLeft = 0;
+};
+
+ModalboxPayment.prototype._updateOptions = function (options) {
+	if (typeof options  === 'object') {
+		for (var key in options) {
+			this.setOption(key, options[key]);
+		}
+	}
+};
+
+ModalboxPayment.prototype._createSpinner = function () {
+	var div = this.window.document.createElement('div');
+	div.id = this.spinnerId;
+
+	div.style.cssText = 'position:  absolute;' +
+	'width: 140px;' +
+	'height: 140px;' +
+	'background: #000;' +
+	'-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=10)";' +
+	'background: rgba(0,0,0,0.9);' +
+	'left: 50%;' +
+	'top: 50%;' +
+	'margin-top: -70px;' +
+	'margin-left: -70px;' +
+	'opacity: 0.6;' +
+	'border-radius: 15px;' +
+	'z-index: 100000;';
+
+	var opts = {
+		color: '#fff',
+		radius:30,
+		lines: 17,
+		length: 17,
+		width: 7,
+		hwaccel: true
+	};
+
+	var spinner = new Spinner(opts).spin(div);
+	return div;
+};
+
+ModalboxPayment.prototype._createOverlay = function () {
+	var div = this.window.document.createElement('div');
+	div.id = this.overlayId;
+	div.style.display = 'block';
+	div.style.opacity = '0.3';
+	div.style.background = '#000000';
+
+	/* ie8 opacity */
+	div.style.filter = 'alpha(opacity=50)';
+
+	div.style.width = '100%';
+	div.style.height = '100%';
+	div.style.top = '0';
+	div.style.left = '0';
+	div.style.zIndex = 10000;
+
+	// cover whole screen
+	div.style.position = 'fixed';
+
+	return div;
+};
+
+ModalboxPayment.prototype._removeOverlay = function () {
+	if (this.overlay) {
+		var elem = this.window.document.getElementById(this.overlayId);
+		elem.parentNode.removeChild(elem);
+		this.overlay = null;
+	}
+};
+
+ModalboxPayment.prototype._removeSpinner = function () {
+	if (this.spinner) {
+		var elem = this.window.document.getElementById(this.spinnerId);
+		elem.parentNode.removeChild(elem);
+		this.spinner = null;
+	}
+};
+
+ModalboxPayment.prototype._showSpinner = function () {
+	if(!this.spinner) {
+		this.spinner = this._createSpinner();
+		this.window.document.body.appendChild(this.spinner);
+	}
+};
+
+ModalboxPayment.prototype._showOverlay = function () {
+	if(!this.overlay) {
+		this.overlay = this._createOverlay();
+		this.window.document.body.appendChild(this.overlay);
+	}
+};
+
+ModalboxPayment.prototype._getGet = function (sVar) {
+	return decodeURI(this.window.location.search.replace(new RegExp('^(?:.*[&\\?]' + encodeURI(sVar).replace(/[\.\+\*]/g, '\\$&') + '(?:\\=([^&]*))?)?.*$', 'i'), '$1'));
+};
+
+// cross-browser event registration
+ModalboxPayment.prototype._addEvent = function (evnt, elem, func) {
+	if (elem.addEventListener) {  // W3C DOM
+		elem.addEventListener(evnt, func, false);
+	}
+	else if (elem.attachEvent) { // IE DOM
+		elem.attachEvent('on' + evnt, func);
+	}
+	else { // No much to do
+		elem[evnt] = func;
+	}
+};
+
+ModalboxPayment.prototype._initSession = function () {
+	// init lazy loading session
+	this._postMessage(JSON.stringify({
+		type: 'modalbox-init-session'
+	}), this.iframe.contentWindow);
+};
+
+// cross-browser event unregistration
+ModalboxPayment.prototype._removeEvent = function (evnt, elem, func) {
+	if (elem.removeEventListener) {  // W3C DOM
+		elem.removeEventListener(evnt, func, false);
+	}
+	else if (elem.attachEvent) { // IE DOM
+		elem.detachEvent('on' + evnt, func);
+	}
+	else { // No much to do
+		elem[evnt] = null;
+	}
+};
+
+// get current viewport scale
+ModalboxPayment.prototype._getScale = function () {
+	this.viewportScale = undefined;
+
+	// Get viewport width
+	var viewportWidth = document.documentElement.clientWidth;
+
+	// Abort. Screen width is greater than the viewport width (not fullscreen).
+	if (screen.width > viewportWidth) {
+		//this._log('Aborted viewport scale measurement. Screen width > viewport width');
+		return 1;
+	}
+
+	// Get the orientation corrected screen width
+	this._updateOrientation();
+	this.screenWidth = screen.width;
+
+	if (this.orientation === 'portrait') {
+		// Take smaller of the two dimensions
+		if (screen.width > screen.height) { this.screenWidth = screen.height; }
+	}
+	else {
+		// Take larger of the two dimensions
+		if (screen.width < screen.height) { this.screenWidth = screen.height; }
+	}
+
+	// Calculate viewport scale
+	this.viewportScale = this.screenWidth / this.window.innerWidth;
+
+	return this.viewportScale;
+};
+
+// updates orientation status
+ModalboxPayment.prototype._updateOrientation = function () {
+	this.orientation = this.window.orientation;
+
+	if (this.orientation === undefined) {
+		// No JavaScript orientation support. Work it out.
+		if (document.documentElement.clientWidth > document.documentElement.clientHeight) { this.orientation = 'landscape'; }
+		else { this.orientation = 'portrait'; }
+
+	}
+	else if (this.orientation === 0 || this.orientation === 180) { this.orientation = 'portrait'; }
+	else {
+		this.orientation = 'landscape'; // Assumed default, most laptop and PC screens.
+	}
+};
+
+// sets viewport in the parent
+ModalboxPayment.prototype._setParentViewport = function () {
+	try {
+		// set viewport for parent
+		var viewPortTag = document.getElementById('viewport');
+
+		if (!viewPortTag) {
+			viewPortTag = document.createElement('meta');
+			viewPortTag.id = 'viewport';
+			viewPortTag.name = 'viewport';
+			this.window.parent.document.getElementsByTagName('head')[0].appendChild(viewPortTag);
+		}
+
+		viewPortTag.content = 'width=device-width, minimum-scale=1.0, maximum-scale=1.0, initial-scale=1.0';
+
+		// viewport on gesture for iphones
+		if (navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPad/i)) {
+			this._addEvent('gesturestart', this.window.document.body, function () {
+				viewPortTag.content = 'width=device-width, minimum-scale=0.25, maximum-scale=1.6';
+			});
+		}
+	} catch(e) {
+		return false;
+	}
+};
+
+ModalboxPayment.prototype._restoreParentViewport = function () {
+	try {
+		var viewport = document.getElementById('viewport');
+
+		if (viewport) {
+			viewport.setAttribute('content', 'width=device-width, initial-scale=1');
+		}
+	} catch (e) {
+		return false;
+	}
+};
+
+ModalboxPayment.prototype._generateUrl = function (baseUrl, params, config, hash) {
+	var ret = [];
+	var url = baseUrl;
+
+	// fix url, remove existing hashes
+	url = url.replace(/\#.*$/, '');
+
+	// add params
+	if (params) {
+		var arr = [];
+		for (var d in params) {
+			if(typeof params[d] !== 'undefined') {
+				arr.push(encodeURIComponent(d) + '=' + encodeURIComponent(params[d]));
+			}
+		}
+		url += (url.indexOf('?') >= 0 ? '&' : '?') + arr.join('&');
+	}
+
+	// add module config
+	if (config) {
+		var arr2 = [];
+		for (var d2 in config) {
+			if(typeof config[d2] !== 'undefined') {
+				arr2.push('mc[' + encodeURIComponent(d2) + ']' + '=' + encodeURIComponent(config[d2]));
+			}
+		}
+		url += (url.indexOf('?') >= 0 ? '&' : '?') + arr2.join('&');
+	}
+
+	// add hash
+	if (hash) {
+		url += '#/' + (hash ? hash : '');
+	}
+
+	//this._log('modalbox URL length: ' + url.length + ' chars');
+	return url;
+};
+
+ModalboxPayment.prototype._postMessage = function (message, window, origin) {
+	origin = origin ? origin : '*';
+
+	window.postMessage(message, origin);
+};
+
+ModalboxPayment.prototype._log = function (message) {
+	if (typeof console !== 'undefined' && typeof console.log !== 'undefined') {
+		console.log(message);
+	}
+};
+
+ModalboxPayment.prototype._isMobile = function () {
+	return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+};
+
+ModalboxPayment.prototype._isParentInFrame = function () {
+	try {
+		return window.self !== window.top ? 1 : 0;
+	} catch (e) {
+		return 1;
+	}
+};
+
+// creates final URL for redirect
+ModalboxPayment.prototype._generateSuccessUrl = function () {
+	var url;
+
+	if (this.options.s) {
+		url = this.succesUrl + 'CAMS/DE/Darsteller/' + encodeURIComponent(this.options.s) + '/';
+	} else {
+		url = this.succesUrl;
+	}
+
+	if (this.transferToken) {
+		url += (url.indexOf('?') >= 0 ? '&' : '?') + 'transfer_token=' + encodeURIComponent(this.transferToken);
+	}
+	if (this.options.pfm) {
+		url += (url.indexOf('?') >= 0 ? '&' : '?') + 'xpfm=' + encodeURIComponent(this.options.pfm);
+	}
+	if (this.options.w) {
+		url += (url.indexOf('?') >= 0 ? '&' : '?') + 'w=' + encodeURIComponent(this.options.w);
+	}
+	if (this.options.ws) {
+		url += (url.indexOf('?') >= 0 ? '&' : '?') + 'ws=' + encodeURIComponent(this.options.ws);
+	}
+
+	return url;
+};
+
+/**
+ * Sends action to Paytour
+ */
+ModalboxPayment.prototype._sendAction = function (actionObj) {
+	if (typeof actionObj  === 'object') {
+		var that = this;
+		var sendCallback = function () {
+			that._postMessage(JSON.stringify(actionObj), that.iframe.contentWindow);
+		};
+
+		if (that.loaded) {
+			sendCallback();
+		} else {
+			var intSend = null;
+			intSend = window.setInterval(function () {
+				if (that.loaded) {
+					sendCallback();
+					window.clearInterval(intSend);
+				}
+			}, 500);
+		}
+	}
+};
+
+ModalboxPayment.prototype._registerResponseHandler = function (name, resolveCallback) {
+	this._responseHandlers[name] = {
+		resolve: resolveCallback
+	};
+};
+
+/******************* Public methods **************************/
+
+/**
+ * Tries to restore Paytour according to the URL params
+ * @returns {boolean}
+ */
+ModalboxPayment.prototype.tryRestore = function () {
+	if (this._getGet('showModalbox') === '1') {
+		this._restore();
+		return true;
+	}
+	return false;
+};
+
+/**
+ * Initializes Iframe and adds to DOM
+ * @param path
+ */
+ModalboxPayment.prototype.init = function (path) {
+	this.view = path || '';
+	this._initIframe(path);
+};
+
+
+/**
+ * Hides Iframe and overlay on the page, restores viewport
+ */
+ModalboxPayment.prototype.hide = function () {
+	if (this.iframe && this.visible) {
+		this.iframe.style.display = 'none';
+		this.window.document.body.style.overflow = 'auto';
+		this._restoreParentViewport();
+		this._removeOverlay();
+		this._removeSpinner();
+		this.visible = false;
+	}
+};
+
+/**
+ * Sends additional parameters to the Paytour through postMessages
+ * @param options
+ */
+ModalboxPayment.prototype.sendOptions = function (options) {
+	if (typeof options  === 'object') {
+		var that = this;
+		var sendCallback = function () {
+			var params = {};
+			params.type = 'modalbox-update-params';
+			params.options = options;
+			that._postMessage(JSON.stringify(params), that.iframe.contentWindow);
+			that._updateOptions(options);
+		};
+
+		if (that.loaded) {
+			sendCallback();
+		} else {
+			var intSend = null;
+			intSend = window.setInterval(function () {
+				if (that.loaded) {
+					sendCallback();
+					window.clearInterval(intSend);
+				}
+			}, 500);
+		}
+	}
+};
+
+/**
+ * Open paytour in MoneyCharge flow and show given route
+ */
+ModalboxPayment.prototype.openPaytour = function (route) {
+	var flow = 'moneycharge'; /** TODO: Move into business logic **/
+	if (this.options.flow !== flow) {
+		this.options.flow = flow;
+		this.sendOptions({ flow: this.options.flow });
+
+		this._show(route ? route : 'payment');
+	} else {
+		this._show(route);
+	}
+};
+
+/**
+ * Opens Modalbox Paytour with preselected paytype
+ * @param paytype
+ */
+ModalboxPayment.prototype.openPaytourByPaytype = function (paytype) {
+	var flow = 'moneycharge'; /** TODO: Move into business logic **/
+	this.options.flow = flow;
+	this.sendOptions({ paytype: paytype, flow: flow });
+	this._show('');
+};
+
+/**
+ * Open Paytour in abo flow
+ * @param flow
+ */
+ModalboxPayment.prototype.openAboPaytour = function () {
+	this.options.flow = 'vipabo';
+	this.sendOptions({ flow: this.options.flow });
+	this._show('abo');
+};
+
+/**
+ * Open Paytour in Creditcard change flow
+ * @param paytype
+ */
+ModalboxPayment.prototype.openChangeCreditcard = function () {
+	this.options.flow = 'changecc';
+	this.sendOptions({ flow: this.options.flow, paytype: 'CC' });
+	this._show();
+};
+
+/**
+ * Open Paytour in Login flow
+ * @param flow
+ */
+ModalboxPayment.prototype.openLogin = function () {
+	this.options.flow = 'login';
+	this.sendOptions({ flow: this.options.flow });
+	this._show('login');
+};
+
+/**
+ * Opens Signup in Login Flow
+ */
+ModalboxPayment.prototype.openSignup = function () {
+	this.options.flow = 'login';
+	this.sendOptions({ flow: this.options.flow });
+	this._show('signup');
+};
+
+/** Logout current user */
+ModalboxPayment.prototype.logout = function () {
+	this._sendAction({
+		type: 'modalbox-action-logout'
+	});
+};
+
+/** Checks if user is logged in and resolves callback */
+ModalboxPayment.prototype.isLoggedIn = function (resolve) {
+	this._registerResponseHandler('isLoggedIn', resolve);
+
+	this._sendAction({
+		type: 'modalbox-action-isLoggedIn'
+	});
+};
+
+/**
+ * initialize paytour with default options
+ */
+ModalboxPayment.prototype.initPaytour = function() {
+	this.options.environment = "lp";
+	this.options.flow = "moneycharge";
+
+	if (!this.tryRestore()) {
+		this.init('');
+	}
+};
+
+/**
+ * Open paytour and show given route
+ */
+ModalboxPayment.prototype.showPaytour = function (route) {
+	this._show(route);
+};
+
+/**
+ * Set callback for given event
+ * e.g.: 'success', 'close'
+ * @param event
+ * @param callback
+ */
+ModalboxPayment.prototype.on = function (event, callback) {
+	if (typeof event === 'string') {
+		var eventName = 'on' + event.charAt(0).toUpperCase() + event.slice(1);
+		this[eventName] = callback;
+	}
+};
+
+/*********************** These methods will soon be removed *******************/
+
+/**
+ * Only provided to keep compatibility with older versions
+ * @deprecated
+ */
+ModalboxPayment.prototype.show = function (route) {
+	this._show(route);
+};

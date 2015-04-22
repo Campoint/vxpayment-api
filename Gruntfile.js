@@ -11,8 +11,12 @@ module.exports = function (grunt) {
 			dist: {
 				src: ['spin.min.js', 'vxpay-iframe-api.min.js'],
 				dest: 'vxpay-iframe.min.js'
+			},
+			dev: {
+				src: ['spin.js', 'vxpay-iframe.js'],
+				dest: 'vxpay-iframe-dev.js'
 			}
-		}
+		},
 	});
 
 
