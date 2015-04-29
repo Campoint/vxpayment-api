@@ -613,12 +613,11 @@ ModalboxPayment.prototype._isParentInFrame = function () {
 
 // creates final URL for redirect
 ModalboxPayment.prototype._generateSuccessUrl = function () {
-	var url;
+	var url = this.succesUrl;
 
+	// set hostId
 	if (this.options.s) {
-		url = this.succesUrl + 'CAMS/DE/Darsteller/' + encodeURIComponent(this.options.s) + '/';
-	} else {
-		url = this.succesUrl;
+		url += (url.indexOf('?') >= 0 ? '&' : '?') + 'jump=shpprofile&s=' + encodeURIComponent(this.options.s);
 	}
 
 	if (this.transferToken) {

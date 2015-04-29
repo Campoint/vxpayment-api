@@ -4,7 +4,7 @@ describe('Modalbox JS API Test', function() {
 
 	var options = {
 		agbUrl: 'http://www.visit-x.com/agb',
-		host: '3135103_PrettyNina',
+		host: '3135103',
 		hostImg: 'www.example.com/image.png',
 		pfm: 751,
 		w: 'webid',
@@ -53,7 +53,7 @@ describe('Modalbox JS API Test', function() {
 			expect(modalbox.window.ModalboxPayment).toBe(modalbox);
 		});
 
-		var hostUrlRegex = 'http:\/\/www.visit\-x\.net\/CAMS\/DE\/Darsteller\/' + options.host + '\/';
+		var hostUrlRegex = 'http:\/\/www.visit\-x\.net\/\\?jump=shpprofile&s=' + options.host;
 
 		it('is success URL correct?', function() {
 			expect(modalbox._generateSuccessUrl()).toMatch(new RegExp(hostUrlRegex, 'i'));
@@ -88,7 +88,7 @@ describe('Modalbox JS API Test', function() {
 		var modalbox = new ModalboxPayment(baseUrl, win, options);
 		modalbox.transferToken = tt_token;
 
-		var hostUrlRegex = 'http:\/\/www.visit\-x\.net\/CAMS\/DE\/Darsteller\/' + options.host + '\/';
+		var hostUrlRegex = 'http:\/\/www.visit\-x\.net\/\\?jump=shpprofile&s=' + options.host;
 
 		it('can we genearate url with transfer_token?', function() {
 			expect(modalbox._generateSuccessUrl()).toMatch(new RegExp(hostUrlRegex + '.*[\?&]transfer_token=' + tt_token, 'i'));
@@ -187,7 +187,7 @@ describe('Modalbox JS API Test', function() {
 
 	describe('Modalbox for Landing page', function() {
 		var adtv = '11467_c7c8c2_e68b6';
-		var selHost = 'PrettyNina';
+		var selHost = '3135103';
 		var option = 'CSB10E';
 
 		var baseUrl = '/paytour1?ovif=1&option=CSB10E&s=4310290& ' + adtv;
