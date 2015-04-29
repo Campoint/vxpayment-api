@@ -29,6 +29,7 @@ var ModalboxPayment = function (urls, window, options, config, events) {
 	this.visible = false;
 	this.window.ModalboxPayment = this;
 	this._responseHandlers = {};
+	this._storedValues = {};
 };
 
 /********************** Internal setter methods  **************************/
@@ -244,8 +245,10 @@ ModalboxPayment.prototype._show = function (path) {
 	this.visible = true;
 	this._initSession();
 	this.iframe.style.display = 'block';
-	this.window.document.body.style.overflow = 'hidden';
 
+	// store orig. overflow and set new
+	this._storedValues.parentBodyOverflow = this.window.document.body.style.overflow;
+	this.window.document.body.style.overflow = 'hidden';
 
 	// scroll parent to top - for mobiles
 	this.window.scrollTo(0,1);
@@ -694,7 +697,12 @@ ModalboxPayment.prototype.init = function (path) {
 ModalboxPayment.prototype.hide = function () {
 	if (this.iframe && this.visible) {
 		this.iframe.style.display = 'none';
-		this.window.document.body.style.overflow = 'auto';
+
+		// restore overflow on body
+		if (typeof this._storedValues.parentBodyOverflow !== 'undefined') {
+			this.window.document.body.style.overflow = this._storedValues.parentBodyOverflow;
+		}
+
 		this._restoreParentViewport();
 		this._removeOverlay();
 		this._removeSpinner();
