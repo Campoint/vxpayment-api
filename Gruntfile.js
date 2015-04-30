@@ -6,7 +6,7 @@ module.exports = function (grunt) {
 	grunt.initConfig({
 		concat: {
 			options: {
-				separator: ';'
+				separator: ''
 			},
 			dist: {
 				src: ['spin.min.js', 'vxpay-iframe-api.min.js'],
