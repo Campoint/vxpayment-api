@@ -2,6 +2,7 @@
  * Copyright (c) 2011-2014 Felix Gnass
  * Licensed under the MIT license
  */
+/* jshint ignore:start */
 (function(root, factory) {
 
   /* CommonJS */
@@ -16,9 +17,9 @@
 (this, function() {
   "use strict";
 
-  var prefixes = ['webkit', 'Moz', 'ms', 'O'] /* Vendor prefixes */
-    , animations = {} /* Animation rules keyed by their name */
-    , useCssAnimations /* Whether to use CSS animations or setTimeout */
+  var prefixes = ['webkit', 'Moz', 'ms', 'O'], /* Vendor prefixes */
+     animations = {}, /* Animation rules keyed by their name */
+     useCssAnimations; /* Whether to use CSS animations or setTimeout */
 
   /**
    * Utility function to create elements. If no tag name is given,
@@ -347,3 +348,4 @@
   return Spinner
 
 }));
+/* jshint ignore:end */
