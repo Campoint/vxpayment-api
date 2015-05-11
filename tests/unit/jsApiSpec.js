@@ -127,6 +127,15 @@ describe('Modalbox JS API Test', function() {
 			},
 			onReady: function () {
 				return true;
+			},
+			onInit: function () {
+				return true;
+			},
+			onAfterShow: function () {
+				return true;
+			},
+			onAfterHide: function () {
+				return true;
 			}
 		};
 
@@ -150,9 +159,13 @@ describe('Modalbox JS API Test', function() {
 			expect(typeof modalbox.onSuccess).toEqual('function');
 			expect(typeof modalbox.onClose).toEqual('function');
 			expect(typeof modalbox.onReady).toEqual('function');
+			expect(typeof modalbox.onInit).toEqual('function');
+			expect(typeof modalbox.onAfterShow).toEqual('function');
+			expect(typeof modalbox.onAfterHide).toEqual('function');
 		});
 		it('callback overwritten?', function() {
 			expect(modalbox.onClose()).toEqual('over');
+			expect(modalbox._trigger('close', {})).toEqual('over');
 		});
 	});
 

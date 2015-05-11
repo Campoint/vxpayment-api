@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.1.17 */
+/** @version 1.2.0 */
 /*jshint strict:false */
 
 /**
@@ -433,13 +433,46 @@ ModalboxPayment.prototype.setEvents = function (events) {
 		if (typeof events.onReady === 'function') {
 			this.on('ready', events.onReady);
 		}
+		if (typeof events.onInit === 'function') {
+			this.on('init', events.onInit);
+		}
+		if (typeof events.onAfterShow === 'function') {
+			this.on('afterShow', events.onAfterShow);
+		}
+		if (typeof events.onAfterHide === 'function') {
+			this.on('afterHide', events.onAfterHide);
+		}
 	}
+
+	// set defaults
+	this._setDefaultEvents();
 };
 
 ModalboxPayment.prototype.setOption = function (key, value) {
 	this.options = this.options || {};
 
 	this.options[key] = value;
+};
+
+ModalboxPayment.prototype._setDefaultEvents = function () {
+	if (typeof this.onAfterShow !== 'function') {
+		this.on('afterShow', function (event) {
+			// store orig. overflow and set new
+			event.modalbox._storedValues.parentBodyOverflow = this.window.document.body.style.overflow;
+			event.modalbox.window.document.body.style.overflow = 'hidden';
+
+			// scroll parent to top - for mobiles
+			event.modalbox.window.scrollTo(0,1);
+		});
+	}
+	if (typeof this.onAfterHide !== 'function') {
+		this.on('afterHide', function (event) {
+			// restore overflow on body
+			if (typeof event.modalbox._storedValues.parentBodyOverflow !== 'undefined') {
+				event.modalbox.window.document.body.style.overflow = event.modalbox._storedValues.parentBodyOverflow;
+			}
+		});
+	}
 };
 
 /**
@@ -463,21 +496,17 @@ ModalboxPayment.prototype._messageHandler = function (evt) {
 		modalbox.hide();
 
 		// onClose callback
-		if (typeof modalbox.onClose === 'function') {
-			modalbox.onClose(msgObject.data);
-		}
+		modalbox._trigger('close', msgObject.data);
 	}
 	else if (msgObject.type === 'modalbox-iframe-ready') {
 		modalbox.ready = true;
 		modalbox._removeSpinner();
 		modalbox._maximizeIframe();
 
-		// onReady callback
-		if (typeof modalbox.onReady === 'function') {
-			modalbox.onReady({
-				modalbox: modalbox
-			});
-		}
+		// init callback
+		modalbox._trigger('init', {
+			modalbox: modalbox
+		});
 	}
 	else if (msgObject.type === 'modalbox-content-loaded') {
 		modalbox.loaded = true;
@@ -493,7 +522,7 @@ ModalboxPayment.prototype._messageHandler = function (evt) {
 	else if (msgObject.type === 'modalbox-success') {
 		//modalbox._log('Paytour success');
 		if (typeof modalbox.onSuccess === 'function') {
-			modalbox.onSuccess(msgObject.data);
+			modalbox._trigger('success', msgObject.data);
 			modalbox.hide();
 		} else {
 			// update options
@@ -532,6 +561,11 @@ ModalboxPayment.prototype._messageHandler = function (evt) {
 			ref: modalbox.options.ref,
 			ruri: modalbox.options.ruri
 		}), modalbox.iframe.contentWindow);
+
+		// paytour is ready with session
+		modalbox._trigger('ready', {
+			modalbox: modalbox
+		});
 	}
 };
 
@@ -597,12 +631,9 @@ ModalboxPayment.prototype._show = function (path) {
 	this._initSession();
 	this.iframe.style.display = 'block';
 
-	// store orig. overflow and set new
-	this._storedValues.parentBodyOverflow = this.window.document.body.style.overflow;
-	this.window.document.body.style.overflow = 'hidden';
-
-	// scroll parent to top - for mobiles
-	this.window.scrollTo(0,1);
+	this._trigger('afterShow', {
+		modalbox: this
+	});
 };
 
 ModalboxPayment.prototype._changeRoute = function (route) {
@@ -1017,6 +1048,16 @@ ModalboxPayment.prototype._registerResponseHandler = function (name, resolveCall
 	};
 };
 
+ModalboxPayment.prototype._trigger = function (event, params) {
+	if (typeof event === 'string') {
+		var eventName = 'on' + event.charAt(0).toUpperCase() + event.slice(1);
+
+		if (typeof this[eventName] === 'function') {
+			return this[eventName](params);
+		}
+	}
+};
+
 /******************* Public methods **************************/
 
 /**
@@ -1048,10 +1089,9 @@ ModalboxPayment.prototype.hide = function () {
 	if (this.iframe && this.visible) {
 		this.iframe.style.display = 'none';
 
-		// restore overflow on body
-		if (typeof this._storedValues.parentBodyOverflow !== 'undefined') {
-			this.window.document.body.style.overflow = this._storedValues.parentBodyOverflow;
-		}
+		this._trigger('afterHide', {
+			modalbox: this
+		});
 
 		this._restoreParentViewport();
 		this._removeOverlay();
