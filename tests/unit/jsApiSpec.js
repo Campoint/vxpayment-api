@@ -337,6 +337,7 @@ describe('Modalbox JS API Test', function() {
 			expect(typeof modalbox.openSignup).toEqual('function');
 			expect(typeof modalbox.openAboPaytour).toEqual('function');
 			expect(typeof modalbox.openChangeCreditcard).toEqual('function');
+			expect(typeof modalbox.openSettings).toEqual('function');
 			expect(typeof modalbox.logout).toEqual('function');
 			expect(typeof modalbox.isLoggedIn).toEqual('function');
 		});

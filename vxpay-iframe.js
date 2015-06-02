@@ -1,4 +1,4 @@
-/** @version 1.2.0 */
+/** @version 1.2.1 */
 /*jshint strict:false */
 
 /**
@@ -821,6 +821,16 @@ ModalboxPayment.prototype.openAboPaytour = function () {
 ModalboxPayment.prototype.openChangeCreditcard = function () {
 	this.options.flow = 'changecc';
 	this.sendOptions({ flow: this.options.flow, paytype: 'CC' });
+	this._show();
+};
+
+/**
+ * Open Settings Flow
+ * @param flow
+ */
+ModalboxPayment.prototype.openSettings = function () {
+	this.options.flow = 'settings';
+	this.sendOptions({ flow: this.options.flow, paytype: '' });
 	this._show();
 };
 
