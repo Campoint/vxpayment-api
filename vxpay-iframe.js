@@ -673,11 +673,15 @@ ModalboxPayment.prototype._generateSuccessUrl = function () {
 /**
  * Sends action to Paytour
  */
-ModalboxPayment.prototype._sendAction = function (actionObj) {
-	if (typeof actionObj  === 'object') {
+ModalboxPayment.prototype._sendAction = function (actionKey) {
+	if (typeof actionKey === 'string') {
 		var that = this;
+		var objToSend = {
+			type: 'modalbox-action-' + actionKey
+		};
+
 		var sendCallback = function () {
-			that._postMessage(JSON.stringify(actionObj), that.iframe.contentWindow);
+			that._postMessage(JSON.stringify(objToSend), that.iframe.contentWindow);
 		};
 
 		if (that.loaded) {
@@ -818,6 +822,26 @@ ModalboxPayment.prototype.openAboPaytour = function () {
 };
 
 /**
+ * Open Paytour in VXTV abo flow
+ * @param flow
+ */
+ModalboxPayment.prototype.openVXTVAbo = function () {
+	this.options.flow = 'vxtvabo';
+	this.sendOptions({ flow: this.options.flow });
+	this._show('abo');
+};
+
+/**
+ * Returns list of active Abos from backend
+ */
+ModalboxPayment.prototype.getActiveAbos = function (resolve) {
+	var key = 'getactiveabos';
+	this._registerResponseHandler(key, resolve);
+
+	this._sendAction(key);
+};
+
+/**
  * Open Paytour in Creditcard change flow
  * @param paytype
  */
@@ -858,18 +882,15 @@ ModalboxPayment.prototype.openSignup = function () {
 
 /** Logout current user */
 ModalboxPayment.prototype.logout = function () {
-	this._sendAction({
-		type: 'modalbox-action-logout'
-	});
+	this._sendAction('logout');
 };
 
 /** Checks if user is logged in and resolves callback */
 ModalboxPayment.prototype.isLoggedIn = function (resolve) {
-	this._registerResponseHandler('isLoggedIn', resolve);
+	var key = 'isLoggedIn';
+	this._registerResponseHandler(key, resolve);
 
-	this._sendAction({
-		type: 'modalbox-action-isLoggedIn'
-	});
+	this._sendAction(key);
 };
 
 /**
