@@ -1,4 +1,4 @@
-/** @version 1.2.1 */
+/** @version 1.2.2 */
 /*jshint strict:false */
 
 /**
@@ -59,14 +59,16 @@ ModalboxPayment.prototype.setConfig = function (config) {
 
 ModalboxPayment.prototype.setUrls = function (urls) {
 	this.startUrl = this.window.location.href;
-	this.succesUrl = 'http://www.visit-x.net/';
+	this.successUrl = 'http://www.visit-x.net/';
 
 	// only baseUrl?
 	if (typeof urls === 'string') {
 		this.baseUrl = urls;
 	} else if (typeof urls === 'object') { /* we have a list of URLS? */
-		this.baseUrl = urls.baseUrl;
-		this.succesUrl = urls.successUrl || this.succesUrl;
+		if (urls.baseUrl) {
+			this.baseUrl = urls.baseUrl;
+		}
+		this.successUrl = urls.successUrl || this.successUrl;
 	}
 };
 
@@ -647,7 +649,7 @@ ModalboxPayment.prototype._isParentInFrame = function () {
 
 // creates final URL for redirect
 ModalboxPayment.prototype._generateSuccessUrl = function () {
-	var url = this.succesUrl;
+	var url = this.successUrl;
 
 	// set hostId
 	if (this.options.s) {
