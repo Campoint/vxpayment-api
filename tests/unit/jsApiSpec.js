@@ -173,6 +173,7 @@ describe('Modalbox JS API Test', function() {
 		var baseUrl = 'https://ph.vxpayment.x/';
 		var win = {};
 		var successUrl = 'http://www.visit-x.xxx/';
+		var successUrlNew = 'http://www.visit-x.tv/';
 
 		win.location = {};
 		win.location.search = '?redirect_token=ttt';
@@ -195,6 +196,16 @@ describe('Modalbox JS API Test', function() {
 		});
 		it('base URL set as string', function() {
 			expect(modalbox2.baseUrl).toMatch(new RegExp('vxpayment\.x', 'i'));
+		});
+		it('successURL changed on the fly', function() {
+			modalbox.setUrls({
+				successUrl: successUrlNew
+			});
+
+			// new successUrl?
+			expect(modalbox.successUrl).toMatch(successUrlNew);
+			// old baseUrl is the same?
+			expect(modalbox.baseUrl).toMatch(baseUrl);
 		});
 	});
 
