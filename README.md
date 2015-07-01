@@ -18,4 +18,3 @@ git tag X.Y.Z
 
 ant build
 
-
