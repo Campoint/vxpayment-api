@@ -1,4 +1,4 @@
-/** @version 1.2.2 */
+/** @version 1.2.4 */
 /*jshint strict:false */
 
 /**
@@ -675,11 +675,12 @@ ModalboxPayment.prototype._generateSuccessUrl = function () {
 /**
  * Sends action to Paytour
  */
-ModalboxPayment.prototype._sendAction = function (actionKey) {
+ModalboxPayment.prototype._sendAction = function (actionKey, params) {
 	if (typeof actionKey === 'string') {
 		var that = this;
 		var objToSend = {
-			type: 'modalbox-action-' + actionKey
+			type: 'modalbox-action-' + actionKey,
+			params: params
 		};
 
 		var sendCallback = function () {
@@ -839,7 +840,15 @@ ModalboxPayment.prototype.openVXTVAbo = function () {
 ModalboxPayment.prototype.getActiveAbos = function (resolve) {
 	var key = 'getactiveabos';
 	this._registerResponseHandler(key, resolve);
+	this._sendAction(key);
+};
 
+/**
+ * Returns the current account balance
+ */
+ModalboxPayment.prototype.getBalance = function (resolve) {
+	var key = 'getbalance';
+	this._registerResponseHandler(key, resolve);
 	this._sendAction(key);
 };
 

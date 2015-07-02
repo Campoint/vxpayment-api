@@ -325,6 +325,9 @@ describe('Modalbox JS API Test', function() {
 		it('old showPaytour() method exists?', function() {
 			expect(typeof modalbox.showPaytour).toEqual('function');
 		});
+		it('getBalance() method exists?', function() {
+			expect(typeof modalbox.getBalance).toEqual('function');
+		});
 	});
 
 	/** Flow tests */
