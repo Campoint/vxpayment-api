@@ -406,7 +406,9 @@ ModalboxPayment.prototype._createSpinner = function () {
 		hwaccel: true
 	};
 
-	var spinner = new Spinner(opts).spin(div);
+	if (typeof Spinner !== 'undefined') {
+		var spinner = new Spinner(opts).spin(div);
+	}
 	return div;
 };
 
