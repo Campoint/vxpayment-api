@@ -224,6 +224,9 @@ describe('Modalbox JS API Test', function() {
 		win.parent.document = {};
 		win.parent.document.body = { clientWidth: 1000 };
 
+		win.document = {};
+		win.document.referer = 'http://www.google.com';
+
 		var opts = {
 			agbUrl: 'https://www.visit-x.net/CAMS/DE/Info/Zentrum.html?submod=AGB&track=PaymentdefaultLS_Complete',
 			pfm: 751,
@@ -250,6 +253,20 @@ describe('Modalbox JS API Test', function() {
 		it('adtv in URL', function() {
 			var generatedUrl = modalbox._generateUrl(modalbox.baseUrl, opts);
 			expect(generatedUrl).toMatch(new RegExp('adtv=' + adtv, 'i'));
+		});
+		it('default referer from request', function() {
+			expect(modalbox.options.ref).toMatch(win.document.referrer);
+		});
+		it('undefined default referer from request', function() {
+			win.document.referer = undefined;
+			expect(modalbox.options.ref).toMatch(win.document.referrer);
+		});
+		it('default REQUEST_URL from request', function() {
+			expect(modalbox.options.ruri).toMatch(win.location.href);
+		});
+		it('undefined default REQUEST_URL from request', function() {
+			win.location.href = undefined;
+			expect(modalbox.options.ruri).toMatch(win.location.href);
 		});
 	});
 

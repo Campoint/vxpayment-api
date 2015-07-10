@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.2.4 */
+/** @version 1.2.5 */
 /*jshint strict:false */
 
 /**
@@ -394,8 +394,8 @@ ModalboxPayment.prototype.setOptions = function (options) {
 	this.options.simg = options.hostImg;
 	this.options.w = options.w;
 	this.options.ws = options.ws;
-	this.options.ref = options.ref;
-	this.options.ruri = options.ruri;
+	this.options.ref = options.ref || this.window.document.referrer;
+	this.options.ruri = options.ruri || this.window.location.href;
 	this.options.wt = options.wt;
 	this.options.option = options.option;
 	this.options.lang = options.lang;
@@ -757,7 +757,9 @@ ModalboxPayment.prototype._createSpinner = function () {
 		hwaccel: true
 	};
 
-	var spinner = new Spinner(opts).spin(div);
+	if (typeof Spinner !== 'undefined') {
+		var spinner = new Spinner(opts).spin(div);
+	}
 	return div;
 };
 
