@@ -36,20 +36,20 @@ describe('Modalbox JS API Test', function() {
 		});
 
 		it('should have options set', function() {
-			expect(modalbox.options.aurl).toBe(options.agbUrl);
+			expect(modalbox.optionsLazy.aurl).toBe(options.agbUrl);
 			expect(modalbox.options.pfm).toBe(options.pfm);
 			expect(modalbox.options.s).toBe(options.host);
 			expect(modalbox.options.simg).toBe(options.hostImg);
 			expect(modalbox.options.w).toBe(options.w);
 			expect(modalbox.options.ws).toBe(options.ws);
 			expect(modalbox.transferToken).toBe('');
-			expect(modalbox.options.ref).toBe(options.ref);
-			expect(modalbox.options.ruri).toBe(options.ruri);
+			expect(modalbox.optionsLazy.ref).toBe(options.ref);
+			expect(modalbox.optionsLazy.ruri).toBe(options.ruri);
 			expect(modalbox.options.wt).toBe(options.wt);
 			expect(modalbox.redirectToken).toBe(modalbox._getGet('redirect_token'));
 			expect(modalbox.options.option).toBe(options.option);
 			expect(modalbox.baseUrl).toBe(baseUrl);
-			expect(modalbox.startUrl).toBe(modalbox.window.location.href);
+			expect(modalbox.optionsLazy.surl).toBe(modalbox.window.location.href);
 			expect(modalbox.window.ModalboxPayment).toBe(modalbox);
 		});
 
@@ -244,7 +244,7 @@ describe('Modalbox JS API Test', function() {
 		var modalbox = new ModalboxPayment(baseUrl, win, opts);
 
 		it('base URL set in object', function() {
-			expect(modalbox.options.aurl).toBe(opts.agbUrl);
+			expect(modalbox.optionsLazy.aurl).toBe(opts.agbUrl);
 			expect(modalbox.options.s).toBe(opts.host);
 			expect(modalbox.options.simg).toBe(opts.hostImg);
 			expect(modalbox.options.pfm).toBe(opts.pfm);
@@ -255,18 +255,18 @@ describe('Modalbox JS API Test', function() {
 			expect(generatedUrl).toMatch(new RegExp('adtv=' + adtv, 'i'));
 		});
 		it('default referer from request', function() {
-			expect(modalbox.options.ref).toMatch(win.document.referrer);
+			expect(modalbox.optionsLazy.ref).toMatch(win.document.referrer);
 		});
 		it('undefined default referer from request', function() {
 			win.document.referer = undefined;
-			expect(modalbox.options.ref).toMatch(win.document.referrer);
+			expect(modalbox.optionsLazy.ref).toMatch(win.document.referrer);
 		});
 		it('default REQUEST_URL from request', function() {
-			expect(modalbox.options.ruri).toMatch(win.location.href);
+			expect(modalbox.optionsLazy.ruri).toMatch(win.location.href);
 		});
 		it('undefined default REQUEST_URL from request', function() {
 			win.location.href = undefined;
-			expect(modalbox.options.ruri).toMatch(win.location.href);
+			expect(modalbox.optionsLazy.ruri).toMatch(win.location.href);
 		});
 	});
 
@@ -367,6 +367,7 @@ describe('Modalbox JS API Test', function() {
 			expect(typeof modalbox.openLogin).toEqual('function');
 			expect(typeof modalbox.openSignup).toEqual('function');
 			expect(typeof modalbox.openAboPaytour).toEqual('function');
+			expect(typeof modalbox.openAVS).toEqual('function');
 			expect(typeof modalbox.openChangeCreditcard).toEqual('function');
 			expect(typeof modalbox.openSettings).toEqual('function');
 			expect(typeof modalbox.logout).toEqual('function');

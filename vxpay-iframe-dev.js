@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.2.5 */
+/** @version 1.3.0 */
 /*jshint strict:false */
 
 /**
@@ -362,6 +362,7 @@ var ModalboxPayment = function (urls, window, options, config, events) {
 	this.window = window;
 	this.transferToken = '';
 	this.redirectToken = options.tt || this._getGet('redirect_token');
+	this.defaultSuccessUrl = 'http://www.visit-x.net/';
 
 	this.setUrls(urls);
 	this.setOptions(options);
@@ -387,20 +388,23 @@ var ModalboxPayment = function (urls, window, options, config, events) {
 
 ModalboxPayment.prototype.setOptions = function (options) {
 	this.options = this.options || {};
+	this.optionsLazy = this.optionsLazy || {};
 
-	this.options.aurl = options.agbUrl;
 	this.options.pfm = options.pfm;
 	this.options.s = options.host;
 	this.options.simg = options.hostImg;
 	this.options.w = options.w;
 	this.options.ws = options.ws;
-	this.options.ref = options.ref || this.window.document.referrer;
-	this.options.ruri = options.ruri || this.window.location.href;
 	this.options.wt = options.wt;
 	this.options.option = options.option;
 	this.options.lang = options.lang;
 	this.options.environment = options.environment;
 	this.options.flow = options.flow;
+
+	this.optionsLazy.ref = options.ref || this.window.document.referrer;
+	this.optionsLazy.ruri = options.ruri || this.window.location.href;
+	this.optionsLazy.surl = this.window.location.href;
+	this.optionsLazy.aurl = options.agbUrl;
 };
 
 ModalboxPayment.prototype.setConfig = function (config) {
@@ -409,8 +413,7 @@ ModalboxPayment.prototype.setConfig = function (config) {
 };
 
 ModalboxPayment.prototype.setUrls = function (urls) {
-	this.startUrl = this.window.location.href;
-	this.successUrl = 'http://www.visit-x.net/';
+	this.successUrl = this.defaultSuccessUrl;
 
 	// only baseUrl?
 	if (typeof urls === 'string') {
@@ -559,13 +562,12 @@ ModalboxPayment.prototype._messageHandler = function (evt) {
 	else if ((res = msgObject.type.match(/^transfer_token:(.*)/))) {
 		modalbox.transferToken = res[1];
 
+		var opts = modalbox.optionsLazy;
+		opts.type = 'modalbox-additional-info';
+
 		// send additional parameters back
 		//modalbox._log('updating session');
-		modalbox._postMessage(JSON.stringify({
-			type: 'modalbox-additional-info',
-			ref: modalbox.options.ref,
-			ruri: modalbox.options.ruri
-		}), modalbox.iframe.contentWindow);
+		modalbox._postMessage(JSON.stringify(opts), modalbox.iframe.contentWindow);
 
 		// paytour is ready with session
 		modalbox._trigger('ready', {
@@ -653,7 +655,6 @@ ModalboxPayment.prototype._initIframe = function (path) {
 		this._registerListener();
 
 		var opts = this.options;
-		opts.surl = this.startUrl;
 		opts.tt = this.redirectToken;
 		opts.sview = this.view;
 		opts.lazy = 1;
@@ -1255,6 +1256,15 @@ ModalboxPayment.prototype.isLoggedIn = function (resolve) {
 	this._registerResponseHandler(key, resolve);
 
 	this._sendAction(key);
+};
+
+/**
+ * Opens AVS flow
+ */
+ModalboxPayment.prototype.openAVS = function () {
+	this.options.flow = 'avs';
+	this.sendOptions({ flow: this.options.flow });
+	this._show('avs');
 };
 
 /**
