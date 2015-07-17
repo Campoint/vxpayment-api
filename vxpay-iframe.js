@@ -41,7 +41,6 @@ ModalboxPayment.prototype.setOptions = function (options) {
 
 	this.options.pfm = options.pfm;
 	this.options.s = options.host;
-	this.options.simg = options.hostImg;
 	this.options.w = options.w;
 	this.options.ws = options.ws;
 	this.options.wt = options.wt;

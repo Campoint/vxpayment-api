@@ -5,7 +5,6 @@ describe('Modalbox JS API Test', function() {
 	var options = {
 		agbUrl: 'http://www.visit-x.com/agb',
 		host: '3135103',
-		hostImg: 'www.example.com/image.png',
 		pfm: 751,
 		w: 'webid',
 		ws: 'websubref',
@@ -39,7 +38,6 @@ describe('Modalbox JS API Test', function() {
 			expect(modalbox.optionsLazy.aurl).toBe(options.agbUrl);
 			expect(modalbox.options.pfm).toBe(options.pfm);
 			expect(modalbox.options.s).toBe(options.host);
-			expect(modalbox.options.simg).toBe(options.hostImg);
 			expect(modalbox.options.w).toBe(options.w);
 			expect(modalbox.options.ws).toBe(options.ws);
 			expect(modalbox.transferToken).toBe('');
@@ -231,7 +229,6 @@ describe('Modalbox JS API Test', function() {
 			agbUrl: 'https://www.visit-x.net/CAMS/DE/Info/Zentrum.html?submod=AGB&track=PaymentdefaultLS_Complete',
 			pfm: 751,
 			host: selHost,
-			hostImg: 'https://www.visit-x.net/smif/host/imageRedirect?actor=' + selHost,
 			w: '',
 			ws: '',
 			wt: '',
@@ -246,7 +243,6 @@ describe('Modalbox JS API Test', function() {
 		it('base URL set in object', function() {
 			expect(modalbox.optionsLazy.aurl).toBe(opts.agbUrl);
 			expect(modalbox.options.s).toBe(opts.host);
-			expect(modalbox.options.simg).toBe(opts.hostImg);
 			expect(modalbox.options.pfm).toBe(opts.pfm);
 			expect(modalbox.options.option).toBe(opts.option);
 		});
