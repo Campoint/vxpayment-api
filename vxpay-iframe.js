@@ -796,7 +796,7 @@ ModalboxPayment.prototype.openPaytour = function (route) {
 
 		this._show(route ? route : 'payment');
 	} else {
-		this._show(route);
+		this._show(route ? route : 'payment');
 	}
 };
 
