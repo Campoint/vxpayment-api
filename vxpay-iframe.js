@@ -261,7 +261,7 @@ ModalboxPayment.prototype._registerListener = function () {
 // restore Modalbox after previous extern redirect
 ModalboxPayment.prototype._restore = function () {
 	this.view = 'wait';
-	this._initIframe(this.view);
+	this._initIframe();
 	this._show();
 };
 
@@ -271,7 +271,7 @@ ModalboxPayment.prototype._show = function (path) {
 	this._setParentViewport();
 
 	if (!this.ready) {
-		this._initIframe(path);
+		this._initIframe();
 		this._showSpinner();
 		window.setTimeout(function() {
 			that._show(path);
@@ -298,7 +298,7 @@ ModalboxPayment.prototype._changeRoute = function (route) {
 	}), this.iframe.contentWindow);
 };
 
-ModalboxPayment.prototype._initIframe = function (path) {
+ModalboxPayment.prototype._initIframe = function () {
 	if (!this.iframe) {
 		this._registerListener();
 
@@ -308,7 +308,7 @@ ModalboxPayment.prototype._initIframe = function (path) {
 		opts.lazy = 1;
 
 		// create URL with params
-		var url = this._generateUrl(this.baseUrl, opts, this.modConfig, (path ? path : ''));
+		var url = this._generateUrl(this.baseUrl, opts, this.modConfig);
 
 		this.iframe = this._createIframe(url);
 
@@ -587,7 +587,7 @@ ModalboxPayment.prototype._restoreParentViewport = function () {
 	}
 };
 
-ModalboxPayment.prototype._generateUrl = function (baseUrl, params, config, hash) {
+ModalboxPayment.prototype._generateUrl = function (baseUrl, params, config) {
 	var ret = [];
 	var url = baseUrl;
 
@@ -614,11 +614,6 @@ ModalboxPayment.prototype._generateUrl = function (baseUrl, params, config, hash
 			}
 		}
 		url += (url.indexOf('?') >= 0 ? '&' : '?') + arr2.join('&');
-	}
-
-	// add hash
-	if (hash) {
-		url += '#/' + (hash ? hash : '');
 	}
 
 	//this._log('modalbox URL length: ' + url.length + ' chars');
@@ -739,7 +734,7 @@ ModalboxPayment.prototype.tryRestore = function () {
  */
 ModalboxPayment.prototype.init = function (path) {
 	this.view = path || '';
-	this._initIframe(path);
+	this._initIframe();
 };
 
 
