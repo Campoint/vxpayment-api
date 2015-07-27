@@ -93,7 +93,7 @@
 	<target name="version-tag">
 		<exec executable="node" resolveexecutable="true" outputproperty="apiVersion">
 			<arg value="-e"/>
-			<arg value="console.log(require('${basedir}/package.json').version);"/>
+			<arg value="console.log(require('${basedir}/bower.json').version);"/>
 		</exec>
 
 		<replaceregexp file="${basedir}/vxpay-iframe.js"
@@ -108,6 +108,47 @@
     </target>
 
 	<target name="build" depends="jshint,deleteBuild,version-tag,compressjs,karma,dev-grunt">
+	</target>
+
+	<target name="release">
+		<exec executable="node" resolveexecutable="true" outputproperty="apiVersion">
+			<arg value="-e"/>
+			<arg value="console.log(require('${basedir}/bower.json').version);"/>
+		</exec>
+
+		<echo message="Current version: ${apiVersion}" />
+
+		<input
+			message="Please enter the new version:"
+			addproperty="libver"
+			/>
+
+		<replaceregexp file="${basedir}/bower.json"
+		               match='(version": "[0-9\.\-a-z]+)"'
+		               replace='version": "${libver}"'
+		               byline="true"
+			/>
+
+		<antcall target="build" />
+		<exec executable="git" resolveexecutable="true" failonerror="true">
+			<arg value="commit"/>
+			<arg value="-am"/>
+			<arg value="Api build"/>
+		</exec>
+		<exec executable="git" resolveexecutable="true" failonerror="true">
+			<arg value="tag"/>
+			<arg value="${libver}"/>
+		</exec>
+	</target>
+
+	<target name="push">
+		<exec executable="git" resolveexecutable="true" failonerror="true">
+			<arg value="push"/>
+		</exec>
+		<exec executable="git" resolveexecutable="true" failonerror="true">
+			<arg value="push"/>
+			<arg value="--tags"/>
+		</exec>
 	</target>
 
 	<target name="init" description="Installs all packages for development" depends="dev">
