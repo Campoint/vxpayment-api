@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.3 */
+/** @version 1.3.3 */
 /*jshint strict:false */
 
 /**
@@ -466,7 +466,7 @@ ModalboxPayment.prototype._setDefaultEvents = function () {
 			event.modalbox.window.document.body.style.overflow = 'hidden';
 
 			// scroll parent to top - for mobiles
-			event.modalbox.window.scrollTo(0,1);
+			event.modalbox._scrollTo(1);
 		});
 	}
 	if (typeof this.onAfterHide !== 'function') {
@@ -551,7 +551,7 @@ ModalboxPayment.prototype._messageHandler = function (evt) {
 		}
 	}
 	else if (msgObject.type === 'modalbox-scrollto') {
-		modalbox.window.scrollTo(0, msgObject.data.top);
+		modalbox._scrollTo(msgObject.data.top);
 	}
 	// catch transfer_token
 	else if ((res = msgObject.type.match(/^redirect:(.*)/))) {
@@ -698,6 +698,24 @@ ModalboxPayment.prototype._createIframe = function (url) {
 	}
 
 	return ifrm;
+};
+
+ModalboxPayment.prototype._scrollTo = function (top) {
+	try {
+		// Mootools FX
+		if (typeof Fx !== 'undefined' && typeof Fx.Scroll !== 'undefined') {
+			new Fx.Scroll(window, { duration: 500 }).start(0, top);
+		}
+		// jQuery animation
+		else if (typeof jQuery !== 'undefined' && typeof jQuery.Animation !== 'undefined') {
+			jQuery('html, body').animate({ scrollTop: top }, 500);
+		}
+		// default no animation
+		else {
+			window.scrollTo(0, msgObject.data.top);
+		}
+	} catch(e) {
+	}
 };
 
 ModalboxPayment.prototype._supportsStyleAttr = function (elem, attribute, val){
