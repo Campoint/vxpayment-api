@@ -880,6 +880,15 @@ ModalboxPayment.prototype.openAVS = function () {
 };
 
 /**
+ * Returns user's AVS status
+ */
+ModalboxPayment.prototype.getAVSStatus = function (resolve) {
+	var key = 'getavsstatus';
+	this._registerResponseHandler(key, resolve);
+	this._sendAction(key);
+};
+
+/**
  * initialize paytour with default options
  */
 ModalboxPayment.prototype.initPaytour = function() {
