@@ -71,6 +71,44 @@ describe('Modalbox JS API Test', function() {
 		});
 	});
 
+	describe('setting options test', function() {
+		var baseUrl = 'https://ph.vxpayment.x/';
+		var win = {};
+		win.location = {};
+		win.location.search = '?redirect_token=ttt';
+		win.location.href = 'http://ph.vxpayment-test.x';
+		win.parent = {};
+		win.parent.document = {};
+		win.parent.document.body = { clientWidth: 1000 };
+
+		win.document = {};
+		win.document.referer = 'http://www.google.com';
+
+		var newpfm = 1123;
+		var hostId = 1234567;
+		var newHostId = 12345678;
+
+		var modalbox = new ModalboxPayment(baseUrl, win, options);
+
+		it('should not change pfm', function() {
+			modalbox.setOptions({ pfm: newpfm });
+
+			expect(modalbox.options.pfm).toBe(newpfm);
+		});
+		it('should not change host and not erase pfm', function() {
+			modalbox.setOptions({ host: hostId });
+
+			expect(modalbox.options.s).toBe(hostId);
+			expect(modalbox.options.pfm).toBe(newpfm);
+		});
+		it('updating options after sending to angular', function() {
+			modalbox._updateOptions({ host: newHostId });
+
+			expect(modalbox.options.s).toBe(newHostId);
+			expect(modalbox.options.pfm).toBe(newpfm);
+		});
+	});
+
 	describe('testing transfer_token', function() {
 		var baseUrl = 'https://ph.vxpayment.x/';
 		var win = {};
@@ -317,6 +355,9 @@ describe('Modalbox JS API Test', function() {
 		});
 		it('sendOptions() method exists?', function() {
 			expect(typeof modalbox.sendOptions).toEqual('function');
+		});
+		it('setOptions() method exists?', function() {
+			expect(typeof modalbox.setOptions).toEqual('function');
 		});
 		it('old init() method exists?', function() {
 			expect(typeof modalbox.init).toEqual('function');

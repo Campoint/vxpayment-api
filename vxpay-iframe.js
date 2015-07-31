@@ -35,18 +35,26 @@ var ModalboxPayment = function (urls, window, options, config, events) {
 /********************** Internal setter methods  **************************/
 
 ModalboxPayment.prototype.setOptions = function (options) {
-	this.options = this.options || {};
-	this.optionsLazy = this.optionsLazy || {};
+	this._setOptions(options);
+	this._setOptionsLazy(options);
+};
 
-	this.options.pfm = options.pfm;
-	this.options.s = options.host;
-	this.options.w = options.w;
-	this.options.ws = options.ws;
-	this.options.wt = options.wt;
-	this.options.option = options.option;
-	this.options.lang = options.lang;
-	this.options.environment = options.environment;
-	this.options.flow = options.flow;
+ModalboxPayment.prototype._setOptions = function (options) {
+	this.options = this.options || {};
+
+	this.options.pfm = options.pfm || this.options.pfm;
+	this.options.s = options.host || this.options.s;
+	this.options.w = options.w || this.options.w;
+	this.options.ws = options.ws || this.options.ws;
+	this.options.wt = options.wt || this.options.wt;
+	this.options.option = options.option || this.options.option;
+	this.options.lang = options.lang || this.options.lang;
+	this.options.environment = options.environment || this.options.environment;
+	this.options.flow = options.flow || this.options.flow;
+};
+
+ModalboxPayment.prototype._setOptionsLazy = function (options) {
+	this.optionsLazy = this.optionsLazy || {};
 
 	this.optionsLazy.ref = options.ref || this.window.document.referrer;
 	this.optionsLazy.ruri = options.ruri || this.window.location.href;
@@ -98,12 +106,6 @@ ModalboxPayment.prototype.setEvents = function (events) {
 
 	// set defaults
 	this._setDefaultEvents();
-};
-
-ModalboxPayment.prototype.setOption = function (key, value) {
-	this.options = this.options || {};
-
-	this.options[key] = value;
 };
 
 ModalboxPayment.prototype._setDefaultEvents = function () {
@@ -390,9 +392,7 @@ ModalboxPayment.prototype._maximizeIframe = function () {
 
 ModalboxPayment.prototype._updateOptions = function (options) {
 	if (typeof options  === 'object') {
-		for (var key in options) {
-			this.setOption(key, options[key]);
-		}
+		this._setOptions(options);
 	}
 };
 
