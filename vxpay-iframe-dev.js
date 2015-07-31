@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.3.3 */
+/** @version 1.3.4 */
 /*jshint strict:false */
 
 /**
@@ -374,7 +374,6 @@ var ModalboxPayment = function (urls, window, options, config, events) {
 	this.spinnerId = this.iframeId + 'Spinner';
 
 	// save viewport scale on start
-	this.origScale = this._getScale();
 	this.view = '';
 	this.ready = false;
 	this.loaded = false;
@@ -387,18 +386,26 @@ var ModalboxPayment = function (urls, window, options, config, events) {
 /********************** Internal setter methods  **************************/
 
 ModalboxPayment.prototype.setOptions = function (options) {
-	this.options = this.options || {};
-	this.optionsLazy = this.optionsLazy || {};
+	this._setOptions(options);
+	this._setOptionsLazy(options);
+};
 
-	this.options.pfm = options.pfm;
-	this.options.s = options.host;
-	this.options.w = options.w;
-	this.options.ws = options.ws;
-	this.options.wt = options.wt;
-	this.options.option = options.option;
-	this.options.lang = options.lang;
-	this.options.environment = options.environment;
-	this.options.flow = options.flow;
+ModalboxPayment.prototype._setOptions = function (options) {
+	this.options = this.options || {};
+
+	this.options.pfm = options.pfm || this.options.pfm;
+	this.options.s = options.host || this.options.s;
+	this.options.w = options.w || this.options.w;
+	this.options.ws = options.ws || this.options.ws;
+	this.options.wt = options.wt || this.options.wt;
+	this.options.option = options.option || this.options.option;
+	this.options.lang = options.lang || this.options.lang;
+	this.options.environment = options.environment || this.options.environment;
+	this.options.flow = options.flow || this.options.flow;
+};
+
+ModalboxPayment.prototype._setOptionsLazy = function (options) {
+	this.optionsLazy = this.optionsLazy || {};
 
 	this.optionsLazy.ref = options.ref || this.window.document.referrer;
 	this.optionsLazy.ruri = options.ruri || this.window.location.href;
@@ -450,12 +457,6 @@ ModalboxPayment.prototype.setEvents = function (events) {
 
 	// set defaults
 	this._setDefaultEvents();
-};
-
-ModalboxPayment.prototype.setOption = function (key, value) {
-	this.options = this.options || {};
-
-	this.options[key] = value;
 };
 
 ModalboxPayment.prototype._setDefaultEvents = function () {
@@ -742,9 +743,7 @@ ModalboxPayment.prototype._maximizeIframe = function () {
 
 ModalboxPayment.prototype._updateOptions = function (options) {
 	if (typeof options  === 'object') {
-		for (var key in options) {
-			this.setOption(key, options[key]);
-		}
+		this._setOptions(options);
 	}
 };
 
@@ -867,54 +866,6 @@ ModalboxPayment.prototype._removeEvent = function (evnt, elem, func) {
 	}
 	else { // No much to do
 		elem[evnt] = null;
-	}
-};
-
-// get current viewport scale
-ModalboxPayment.prototype._getScale = function () {
-	this.viewportScale = undefined;
-
-	// Get viewport width
-	var viewportWidth = document.documentElement.clientWidth;
-
-	// Abort. Screen width is greater than the viewport width (not fullscreen).
-	if (screen.width > viewportWidth) {
-		//this._log('Aborted viewport scale measurement. Screen width > viewport width');
-		return 1;
-	}
-
-	// Get the orientation corrected screen width
-	this._updateOrientation();
-	this.screenWidth = screen.width;
-
-	if (this.orientation === 'portrait') {
-		// Take smaller of the two dimensions
-		if (screen.width > screen.height) { this.screenWidth = screen.height; }
-	}
-	else {
-		// Take larger of the two dimensions
-		if (screen.width < screen.height) { this.screenWidth = screen.height; }
-	}
-
-	// Calculate viewport scale
-	this.viewportScale = this.screenWidth / this.window.innerWidth;
-
-	return this.viewportScale;
-};
-
-// updates orientation status
-ModalboxPayment.prototype._updateOrientation = function () {
-	this.orientation = this.window.orientation;
-
-	if (this.orientation === undefined) {
-		// No JavaScript orientation support. Work it out.
-		if (document.documentElement.clientWidth > document.documentElement.clientHeight) { this.orientation = 'landscape'; }
-		else { this.orientation = 'portrait'; }
-
-	}
-	else if (this.orientation === 0 || this.orientation === 180) { this.orientation = 'portrait'; }
-	else {
-		this.orientation = 'landscape'; // Assumed default, most laptop and PC screens.
 	}
 };
 
@@ -1277,6 +1228,15 @@ ModalboxPayment.prototype.openAVS = function () {
 	this.options.flow = 'avs';
 	this.sendOptions({ flow: this.options.flow });
 	this._show('avs');
+};
+
+/**
+ * Returns user's AVS status
+ */
+ModalboxPayment.prototype.getAVSStatus = function (resolve) {
+	var key = 'getavsstatus';
+	this._registerResponseHandler(key, resolve);
+	this._sendAction(key);
 };
 
 /**
