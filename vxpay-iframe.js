@@ -23,7 +23,6 @@ var ModalboxPayment = function (urls, window, options, config, events) {
 	this.spinnerId = this.iframeId + 'Spinner';
 
 	// save viewport scale on start
-	this.origScale = this._getScale();
 	this.view = '';
 	this.ready = false;
 	this.loaded = false;
@@ -516,54 +515,6 @@ ModalboxPayment.prototype._removeEvent = function (evnt, elem, func) {
 	}
 	else { // No much to do
 		elem[evnt] = null;
-	}
-};
-
-// get current viewport scale
-ModalboxPayment.prototype._getScale = function () {
-	this.viewportScale = undefined;
-
-	// Get viewport width
-	var viewportWidth = document.documentElement.clientWidth;
-
-	// Abort. Screen width is greater than the viewport width (not fullscreen).
-	if (screen.width > viewportWidth) {
-		//this._log('Aborted viewport scale measurement. Screen width > viewport width');
-		return 1;
-	}
-
-	// Get the orientation corrected screen width
-	this._updateOrientation();
-	this.screenWidth = screen.width;
-
-	if (this.orientation === 'portrait') {
-		// Take smaller of the two dimensions
-		if (screen.width > screen.height) { this.screenWidth = screen.height; }
-	}
-	else {
-		// Take larger of the two dimensions
-		if (screen.width < screen.height) { this.screenWidth = screen.height; }
-	}
-
-	// Calculate viewport scale
-	this.viewportScale = this.screenWidth / this.window.innerWidth;
-
-	return this.viewportScale;
-};
-
-// updates orientation status
-ModalboxPayment.prototype._updateOrientation = function () {
-	this.orientation = this.window.orientation;
-
-	if (this.orientation === undefined) {
-		// No JavaScript orientation support. Work it out.
-		if (document.documentElement.clientWidth > document.documentElement.clientHeight) { this.orientation = 'landscape'; }
-		else { this.orientation = 'portrait'; }
-
-	}
-	else if (this.orientation === 0 || this.orientation === 180) { this.orientation = 'portrait'; }
-	else {
-		this.orientation = 'landscape'; // Assumed default, most laptop and PC screens.
 	}
 };
 
