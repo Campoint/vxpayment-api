@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.3.4 */
+/** @version 1.3.5 */
 /*jshint strict:false */
 
 /**
@@ -1243,8 +1243,8 @@ ModalboxPayment.prototype.getAVSStatus = function (resolve) {
  * initialize paytour with default options
  */
 ModalboxPayment.prototype.initPaytour = function() {
-	this.options.environment = "lp";
-	this.options.flow = "moneycharge";
+	this.options.environment = this.options.environment || "lp";
+	this.options.flow = this.options.flow || "moneycharge";
 
 	if (!this.tryRestore()) {
 		this.init('');
