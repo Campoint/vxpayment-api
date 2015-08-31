@@ -1,4 +1,4 @@
-/** @version 1.3.5 */
+/** @version 1.3.6 */
 /*jshint strict:false */
 
 /**
@@ -336,7 +336,7 @@ ModalboxPayment.prototype._createIframe = function (url) {
 		ifrm.style.maxHeight = '100vh';
 	} else {
 		if(this._isMobile()) {
-			ifrm.style.maxHeight = '480px';
+			ifrm.style.maxHeight = this._getClientHeight() + 'px';
 		}
 	}
 
@@ -348,6 +348,12 @@ ModalboxPayment.prototype._createIframe = function (url) {
 	}
 
 	return ifrm;
+};
+
+ModalboxPayment.prototype._getClientHeight = function () {
+	return window.innerHeight ||
+		document.documentElement.clientHeight ||
+		document.body.clientHeight;
 };
 
 ModalboxPayment.prototype._scrollTo = function (top) {
