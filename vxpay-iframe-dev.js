@@ -1139,7 +1139,6 @@ ModalboxPayment.prototype.openPaytourByPaytype = function (paytype) {
 
 /**
  * Open Paytour in abo flow
- * @param flow
  */
 ModalboxPayment.prototype.openAboPaytour = function () {
 	this.options.flow = 'vipabo';
@@ -1149,7 +1148,6 @@ ModalboxPayment.prototype.openAboPaytour = function () {
 
 /**
  * Open Paytour in VXTV abo flow
- * @param flow
  */
 ModalboxPayment.prototype.openVXTVAbo = function () {
 	this.options.flow = 'vxtvabo';
@@ -1177,7 +1175,6 @@ ModalboxPayment.prototype.getBalance = function (resolve) {
 
 /**
  * Open Paytour in Creditcard change flow
- * @param paytype
  */
 ModalboxPayment.prototype.openChangeCreditcard = function () {
 	this.options.flow = 'changecc';
@@ -1187,7 +1184,6 @@ ModalboxPayment.prototype.openChangeCreditcard = function () {
 
 /**
  * Open Settings Flow
- * @param flow
  */
 ModalboxPayment.prototype.openSettings = function () {
 	this.options.flow = 'settings';
@@ -1197,20 +1193,29 @@ ModalboxPayment.prototype.openSettings = function () {
 
 /**
  * Open Paytour in Login flow
- * @param flow
  */
-ModalboxPayment.prototype.openLogin = function () {
-	this.options.flow = 'login';
-	this.sendOptions({ flow: this.options.flow });
+ModalboxPayment.prototype.openLogin = function (opts) {
+	var sendOpts = {};
+	if (typeof opts === 'object') {
+		sendOpts = opts;
+	}
+
+	sendOpts.flow = 'login';
+	this.sendOptions(sendOpts);
 	this._show('login');
 };
 
 /**
  * Opens Signup in Login Flow
  */
-ModalboxPayment.prototype.openSignup = function () {
-	this.options.flow = 'login';
-	this.sendOptions({ flow: this.options.flow });
+ModalboxPayment.prototype.openSignup = function (opts) {
+	var sendOpts = {};
+	if (typeof opts === 'object') {
+		sendOpts = opts;
+	}
+
+	sendOpts.flow = 'login';
+	this.sendOptions(sendOpts);
 	this._show('signup');
 };
 
