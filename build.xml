@@ -16,6 +16,7 @@
 	<property name="jshint" value="${basedir}/node_modules/.bin/jshint"/>
 	<property name="karma" value="${basedir}/node_modules/karma/bin/karma"/>
 	<property name="dalek" value="${basedir}/node_modules/.bin/dalek"/>
+	<property name="uglifyjs" value="${basedir}/node_modules/.bin/uglifyjs"/>
     <property name="grunt" value="${basedir}/node_modules/.bin/grunt"/>
 
 	<target name="clean" description="Removes build folders and stuff like that">
@@ -41,7 +42,7 @@
 	</target>
 
 	<target name="compressjs" description="Compresses the JS Files">
-		<exec dir="${basedir}" executable="uglifyjs">
+		<exec dir="${basedir}" executable="${uglifyjs}">
 			<arg value="${basedir}/vxpay-iframe.js"/>
 			<arg value="--comments"/>
 			<arg value="/version/"/>
@@ -51,6 +52,7 @@
 	</target>
 
 	<target name="dev" description="Installs all packages for development" depends="dev-npm">
+		<mkdir dir="${basedir}/http-root"/>
 		<exec executable="ln">
 			<arg value="-s"/>
 			<arg path="${basedir}/vxpay-iframe.js"/>
