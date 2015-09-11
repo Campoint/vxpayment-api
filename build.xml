@@ -12,7 +12,7 @@
 	<property name="bdd_dir" value="${basedir}/features"/>
 	<property name="server_port" value="9123"/>
 	<property name="server_host" value="localhost"/>
-	<property name="npm" value="/usr/local/bin/npm"/>
+	<property name="npm" value="/usr/bin/npm"/>
 	<property name="jshint" value="${basedir}/node_modules/.bin/jshint"/>
 	<property name="karma" value="${basedir}/node_modules/karma/bin/karma"/>
 	<property name="dalek" value="${basedir}/node_modules/.bin/dalek"/>
