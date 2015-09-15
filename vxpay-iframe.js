@@ -1,4 +1,4 @@
-/** @version 1.3.10 */
+/** @version 1.3.11 */
 /*jshint strict:false */
 
 /**
@@ -897,8 +897,11 @@ ModalboxPayment.prototype.openSignup = function (opts) {
 };
 
 /** Logout current user */
-ModalboxPayment.prototype.logout = function () {
-	this._sendAction('logout');
+ModalboxPayment.prototype.logout = function (resolve) {
+	var key = 'logout';
+	this._registerResponseHandler(key, resolve);
+
+	this._sendAction(key);
 };
 
 /** Checks if user is logged in and resolves callback */

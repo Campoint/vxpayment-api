@@ -39,6 +39,7 @@
 	<target name="deleteBuild" description="Deletes generated versions">
 		<delete file="${basedir}/vxpay-iframe-api.min.js"/>
 		<delete file="${basedir}/vxpay-iframe.min.js"/>
+		<delete file="${basedir}/vxpay-iframe-dev.js"/>
 	</target>
 
 	<target name="compressjs" description="Compresses the JS Files">
