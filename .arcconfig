@@ -1,7 +1,4 @@
 {
-  "conduit_uri" : "https://phabricator.x/",
-  "load" : [
-    "/home/phabricator/gcworkflows/src/"
-  ]
+  "project_id" : "VXPaymentApi",
+  "conduit_uri" : "https://phabricator.x/"
 }
-

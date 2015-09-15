@@ -612,8 +612,9 @@ ModalboxPayment.prototype._registerListener = function () {
 };
 
 // restore Modalbox after previous extern redirect
-ModalboxPayment.prototype._restore = function () {
-	this.view = 'wait';
+ModalboxPayment.prototype._restore = function (flow, view) {
+	this.view = view;
+	this.options.flow = flow;
 	this._initIframe();
 	this._show();
 };
@@ -1048,11 +1049,23 @@ ModalboxPayment.prototype._trigger = function (event, params) {
  * @returns {boolean}
  */
 ModalboxPayment.prototype.tryRestore = function () {
-	if (this._getGet('showModalbox') === '1') {
-		this._restore();
-		return true;
+	var getParam = this._getGet('showModalbox');
+	var vxpOpen = this._getGet('vxpAutoFlow');
+	var retVal = false;
+
+	if (getParam === '1') {
+		this._restore('moneycharge', 'wait');
+		retVal = true;
+	} else if (vxpOpen !== '') {
+		var methodName = 'open' + vxpOpen;
+
+		if (typeof this[methodName] === 'function') {
+			this[methodName]();
+			retVal = true;
+		}
 	}
-	return false;
+
+	return retVal;
 };
 
 /**
@@ -1090,6 +1103,8 @@ ModalboxPayment.prototype.hide = function () {
 ModalboxPayment.prototype.sendOptions = function (options) {
 	if (typeof options  === 'object') {
 		var that = this;
+		that._updateOptions(options);
+
 		var sendCallback = function () {
 			var params = {};
 			params.type = 'modalbox-update-params';
@@ -1189,6 +1204,18 @@ ModalboxPayment.prototype.openChangeCreditcard = function () {
 ModalboxPayment.prototype.openSettings = function () {
 	this.options.flow = 'settings';
 	this.sendOptions({ flow: this.options.flow, paytype: '' });
+	this._show();
+};
+
+/**
+ * Open Password reset flow
+ */
+ModalboxPayment.prototype.openPasswordReset = function () {
+	var sendOpts = {};
+	sendOpts.pwdresetKey = this._getGet('key');
+	sendOpts.flow = 'pwdreset';
+
+	this.sendOptions(sendOpts);
 	this._show();
 };
 
