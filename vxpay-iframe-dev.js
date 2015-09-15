@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.3.8 */
+/** @version 1.3.9 */
 /*jshint strict:false */
 
 /**
