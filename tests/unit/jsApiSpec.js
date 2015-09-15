@@ -1,5 +1,24 @@
 'use strict';
 
+function shallowCopy( original )
+{
+	// First create an empty object with
+	// same prototype of our original source
+	var clone = Object.create( Object.getPrototypeOf( original ) ) ;
+
+	var i , keys = Object.getOwnPropertyNames( original ) ;
+
+	for ( i = 0 ; i < keys.length ; i ++ )
+	{
+		// copy each property into the clone
+		Object.defineProperty( clone , keys[ i ] ,
+			Object.getOwnPropertyDescriptor( original , keys[ i ] )
+		) ;
+	}
+
+	return clone ;
+}
+
 describe('Modalbox JS API Test', function() {
 
 	var options = {
@@ -75,7 +94,7 @@ describe('Modalbox JS API Test', function() {
 		var baseUrl = 'https://ph.vxpayment.x/';
 		var win = {};
 		win.location = {};
-		win.location.search = '?redirect_token=ttt';
+		win.location.search = '';
 		win.location.href = 'http://ph.vxpayment-test.x';
 		win.parent = {};
 		win.parent.document = {};
@@ -88,7 +107,10 @@ describe('Modalbox JS API Test', function() {
 		var hostId = 1234567;
 		var newHostId = 12345678;
 
-		var modalbox = new ModalboxPayment(baseUrl, win, options);
+		var custOpts = shallowCopy(options);
+		custOpts.at = 'TOK_access_token';
+
+		var modalbox = new ModalboxPayment(baseUrl, win, custOpts);
 
 		it('should not change pfm', function() {
 			modalbox.setOptions({ pfm: newpfm });
@@ -107,6 +129,9 @@ describe('Modalbox JS API Test', function() {
 			expect(modalbox.options.s).toBe(newHostId);
 			expect(modalbox.options.pfm).toBe(newpfm);
 		});
+		it('injecting access token as redirect token', function() {
+			expect(modalbox.redirectToken).toBe(custOpts.at);
+		});
 	});
 
 	describe('testing transfer_token', function() {
@@ -115,13 +140,17 @@ describe('Modalbox JS API Test', function() {
 		var tt_token = 'tt_token';
 
 		win.location = {};
-		win.location.search = '?redirect_token=ttt';
+		win.location.search = '';
 		win.location.href = 'http://ph.vxpayment-test.x';
 		win.parent = {};
 		win.parent.document = {};
 		win.parent.document.body = { clientWidth: 1000 };
 
-		var modalbox = new ModalboxPayment(baseUrl, win, options);
+		var custOpts = shallowCopy(options);
+		custOpts.tt = 'TT_injected_transfer_token_which_has_higher_priority';
+		custOpts.at = 'TOK_injected_transfer_token_will_be_ignored';
+
+		var modalbox = new ModalboxPayment(baseUrl, win, custOpts);
 		modalbox.transferToken = tt_token;
 
 		var hostUrlRegex = 'http:\/\/www.visit\-x\.net\/\\?jump=shpprofile&s=' + options.host;
@@ -147,6 +176,9 @@ describe('Modalbox JS API Test', function() {
 		it('pfm null, not in URL?', function() {
 			modalbox.options.pfm = null;
 			expect(modalbox._generateSuccessUrl()).not.toMatch(new RegExp(hostUrlRegex + '.*xpfm=.*', 'i'));
+		});
+		it('injected transfer token in constructor', function() {
+			expect(modalbox.redirectToken).toBe(custOpts.tt);
 		});
 	});
 

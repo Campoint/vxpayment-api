@@ -361,7 +361,8 @@
 var ModalboxPayment = function (urls, window, options, config, events) {
 	this.window = window;
 	this.transferToken = '';
-	this.redirectToken = options.tt || this._getGet('redirect_token');
+	// token to initialize session - either from parameter, URL or as access token
+	this.redirectToken = options.tt || this._getGet('redirect_token') || options.at;
 	this.defaultSuccessUrl = 'http://www.visit-x.net/';
 
 	this.setUrls(urls);
