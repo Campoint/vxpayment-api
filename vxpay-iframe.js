@@ -49,6 +49,7 @@ ModalboxPayment.prototype._setOptions = function (options) {
 	this.options.ws = options.ws || this.options.ws;
 	this.options.wt = options.wt || this.options.wt;
 	this.options.option = options.option || this.options.option;
+	this.options.pc = options.pc || this.options.pc;
 	this.options.lang = options.lang || this.options.lang;
 	this.options.environment = options.environment || this.options.environment;
 	this.options.flow = options.flow || this.options.flow;
@@ -919,6 +920,20 @@ ModalboxPayment.prototype.openAVS = function () {
 	this.options.flow = 'avs';
 	this.sendOptions({ flow: this.options.flow });
 	this._show('avs');
+};
+
+/**
+ * Opens PromoCode
+ */
+ModalboxPayment.prototype.openPromoCode = function (opts) {
+	var sendOpts = {};
+	if (typeof opts === 'object') {
+		sendOpts = opts;
+	}
+
+	sendOpts.flow = 'promocode';
+	this.sendOptions(sendOpts);
+	this._show('promocode');
 };
 
 /**
