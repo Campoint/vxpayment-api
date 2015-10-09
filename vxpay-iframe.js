@@ -938,6 +938,22 @@ ModalboxPayment.prototype.openPromoCode = function (opts) {
 };
 
 /**
+ * Opens Carrier Flow
+ */
+ModalboxPayment.prototype.openCarrier = function (opts) {
+	var sendOpts = {};
+	if (typeof opts === 'object') {
+		sendOpts = opts;
+	}
+
+	sendOpts.transactionId = this._getGet('trid');
+	sendOpts.requestId = this._getGet('rid');
+	sendOpts.flow = 'carrier';
+	this.sendOptions(sendOpts);
+	this._show('carrier');
+};
+
+/**
  * Returns user's AVS status
  */
 ModalboxPayment.prototype.getAVSStatus = function (resolve) {
