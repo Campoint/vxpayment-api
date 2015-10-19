@@ -1,4 +1,4 @@
-/** @version 1.3.12 */
+/** @version 1.3.13 */
 /*jshint strict:false */
 
 /**
@@ -701,10 +701,11 @@ ModalboxPayment.prototype._trigger = function (event, params) {
 ModalboxPayment.prototype.tryRestore = function () {
 	var getParam = this._getGet('showModalbox');
 	var vxpOpen = this._getGet('vxpAutoFlow');
+	var vxpFlow = this._getGet('vxpFlow');
 	var retVal = false;
 
 	if (getParam === '1') {
-		this._restore('moneycharge', 'wait');
+		this._restore(vxpFlow ? vxpFlow : 'moneycharge', 'wait');
 		retVal = true;
 	} else if (vxpOpen !== '') {
 		var methodName = 'open' + vxpOpen;
