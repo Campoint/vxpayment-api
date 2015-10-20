@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.3.13 */
+/** @version 1.3.14 */
 /*jshint strict:false */
 
 /**
@@ -1286,6 +1286,22 @@ ModalboxPayment.prototype.openPromoCode = function (opts) {
 	sendOpts.flow = 'promocode';
 	this.sendOptions(sendOpts);
 	this._show('promocode');
+};
+
+/**
+ * Opens Carrier Flow
+ */
+ModalboxPayment.prototype.openCarrier = function (opts) {
+	var sendOpts = {};
+	if (typeof opts === 'object') {
+		sendOpts = opts;
+	}
+
+	sendOpts.transactionId = this._getGet('trid');
+	sendOpts.requestId = this._getGet('rid');
+	sendOpts.flow = 'carrier';
+	this.sendOptions(sendOpts);
+	this._show('carrier');
 };
 
 /**
