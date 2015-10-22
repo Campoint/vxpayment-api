@@ -1,4 +1,4 @@
-/** @version 1.3.14 */
+/** @version 1.3.15 */
 /*jshint strict:false */
 
 /**
@@ -946,8 +946,6 @@ ModalboxPayment.prototype.openCarrier = function (opts) {
 		sendOpts = opts;
 	}
 
-	sendOpts.transactionId = this._getGet('trid');
-	sendOpts.requestId = this._getGet('rid');
 	sendOpts.flow = 'carrier';
 	this.sendOptions(sendOpts);
 	this._show('carrier');
