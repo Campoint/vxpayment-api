@@ -179,9 +179,11 @@ ModalboxPayment.prototype._messageHandler = function (evt) {
 		if (modalbox.visible) {
 			modalbox._initSession();
 
-			modalbox._postMessage(JSON.stringify({
-				type: 'modalbox-is-visible'
-			}));
+			if (!modalbox.tab) {
+				modalbox._postMessage(JSON.stringify({
+					type: 'modalbox-is-visible'
+				}));
+			}
 		}
 
 		// trigger
@@ -202,9 +204,11 @@ ModalboxPayment.prototype._messageHandler = function (evt) {
 		}
 	}
 	else if (msgObject.type === 'modalbox-view-ready') {
-		modalbox._postMessage(JSON.stringify({
-			type: 'modalbox-is-visible'
-		}));
+		if (!modalbox.tab) {
+			modalbox._postMessage(JSON.stringify({
+				type: 'modalbox-is-visible'
+			}));
+		}
 	}
 	// process action response
 	else if ((res = msgObject.type.match(/^modalbox-response-(.*)/))) {
