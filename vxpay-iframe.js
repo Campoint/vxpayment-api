@@ -992,6 +992,14 @@ ModalboxPayment.prototype.on = function (event, callback) {
 	}
 };
 
+/** Remove event handlers for event */
+ModalboxPayment.prototype.off = function (event) {
+	if (typeof event === 'string') {
+		var eventName = 'on' + event.charAt(0).toUpperCase() + event.slice(1);
+		delete this[eventName];
+	}
+};
+
 /*********************** These methods will soon be removed *******************/
 
 /**
