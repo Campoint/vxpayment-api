@@ -32,10 +32,8 @@ var ModalboxPayment = function (urls, window, options, config, events) {
 	this.window.ModalboxPayment = this;
 
 	// explicitly trigger new tab feature?
-	if (typeof options.useTab !== 'undefined') {
-		this.useTab = options.useTab;
-	} else {
-		this.useTab = this._isMobile();
+	if (typeof options.enableTab !== 'undefined') {
+		this.useTab = options.enableTab && this._isMobile();
 	}
 
 	this._responseHandlers = {};
@@ -328,7 +326,7 @@ ModalboxPayment.prototype._showTab = function (path) {
 	this.visible = true;
 	this._initSession();
 
-	this.on('loaded', function() {
+	this.on('ready', function() {
 		if(typeof path !== 'undefined' && path !== '') {
 			that._changeRoute('/' + path);
 		} else {
@@ -1115,19 +1113,33 @@ ModalboxPayment.prototype.showPaytour = function (route) {
  * e.g.: 'success', 'close'
  * @param event
  * @param callback
+ * @param add
  */
 ModalboxPayment.prototype.on = function (event, callback, add) {
 	if (typeof event === 'string') {
 		var eventName = 'on' + event.charAt(0).toUpperCase() + event.slice(1);
 		if (add === 'append') {
 			if (!this._isArray(this[eventName])) {
+				var oldHandler = this[eventName];
 				this[eventName] = [];
+
+				if (oldHandler) {
+					this[eventName].push(oldHandler);
+				}
 			}
 
-			this[eventName].push(callback);
+			this[eventName].unshift(callback);
 		} else {
 			this[eventName] = callback;
 		}
+	}
+};
+
+/** Remove event handlers for event */
+ModalboxPayment.prototype.off = function (event) {
+	if (typeof event === 'string') {
+		var eventName = 'on' + event.charAt(0).toUpperCase() + event.slice(1);
+		delete this[eventName];
 	}
 };
 
