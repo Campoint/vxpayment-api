@@ -779,11 +779,10 @@ ModalboxPayment.prototype._trigger = function (event, params) {
 	}
 };
 
-
 ModalboxPayment.prototype._isArray = function(obj) {
 	return (typeof obj !== 'undefined' &&
 		obj && obj.constructor === Array);
-}
+};
 
 /******************* Public methods **************************/
 
