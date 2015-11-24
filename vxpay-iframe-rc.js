@@ -33,7 +33,7 @@ var ModalboxPayment = function (urls, window, options, config, events) {
 
 	// explicitly trigger new tab feature?
 	if (typeof options.enableTab !== 'undefined') {
-		this.useTab = options.enableTab && this._isMobile();
+		this.useTab = options.enableTab && this._supportsTabs();
 	}
 
 	this._responseHandlers = {};
@@ -679,6 +679,10 @@ ModalboxPayment.prototype._log = function (message) {
 
 ModalboxPayment.prototype._isMobile = function () {
 	return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+};
+
+ModalboxPayment.prototype._supportsTabs = function () {
+	return this._isMobile() && !(/IEMobile/i.test(navigator.userAgent));
 };
 
 ModalboxPayment.prototype._isParentInFrame = function () {
