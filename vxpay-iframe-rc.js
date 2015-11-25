@@ -991,6 +991,15 @@ ModalboxPayment.prototype.openSettings = function () {
 };
 
 /**
+ * Open extended VX Settings Flow
+ */
+ModalboxPayment.prototype.openVXSettings = function () {
+	this.options.flow = 'vxsettings';
+	this.sendOptions({ flow: this.options.flow, paytype: '' });
+	this._show();
+};
+
+/**
  * Open Password reset flow
  */
 ModalboxPayment.prototype.openPasswordReset = function () {

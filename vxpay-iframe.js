@@ -1,4 +1,4 @@
-/** @version 1.3.15 */
+/** @version 1.3.16 */
 /*jshint strict:false */
 
 /**
@@ -854,6 +854,15 @@ ModalboxPayment.prototype.openChangeCreditcard = function () {
  */
 ModalboxPayment.prototype.openSettings = function () {
 	this.options.flow = 'settings';
+	this.sendOptions({ flow: this.options.flow, paytype: '' });
+	this._show();
+};
+
+/**
+ * Open extended VX Settings Flow
+ */
+ModalboxPayment.prototype.openVXSettings = function () {
+	this.options.flow = 'vxsettings';
 	this.sendOptions({ flow: this.options.flow, paytype: '' });
 	this._show();
 };
