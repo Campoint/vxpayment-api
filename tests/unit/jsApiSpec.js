@@ -444,6 +444,7 @@ describe('Modalbox JS API Test', function() {
 			expect(typeof modalbox.openPasswordReset).toEqual('function');
 			expect(typeof modalbox.logout).toEqual('function');
 			expect(typeof modalbox.isLoggedIn).toEqual('function');
+			expect(typeof modalbox.hook).toEqual('function');
 		});
 	});
 

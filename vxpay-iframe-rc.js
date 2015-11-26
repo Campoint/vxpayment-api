@@ -38,6 +38,7 @@ var ModalboxPayment = function (urls, window, options, config, events) {
 
 	this._responseHandlers = {};
 	this._storedValues = {};
+	this._hooks = {};
 	this._registerListener();
 };
 
@@ -768,6 +769,8 @@ ModalboxPayment.prototype._trigger = function (event, params) {
 	if (typeof event === 'string') {
 		var eventName = 'on' + event.charAt(0).toUpperCase() + event.slice(1);
 
+		this._triggerHooks(eventName, params);
+
 		if (typeof this[eventName] === 'function') {
 			return this[eventName](params);
 		} else if (this._isArray(this[eventName])) {
@@ -778,6 +781,20 @@ ModalboxPayment.prototype._trigger = function (event, params) {
 				if (ret) {
 					this[eventName].splice(i, 1);
 				}
+			}
+		}
+	}
+};
+
+ModalboxPayment.prototype._triggerHooks = function (eventName, params) {
+	if (typeof eventName === 'string' && typeof this._hooks[eventName] !== 'undefined') {
+		var hooks = this._hooks[eventName];
+		var i = hooks.length;
+		while (i--) {
+			var ret = hooks[i](params);
+
+			if (ret) {
+				this._hooks[eventName].splice(i, 1);
 			}
 		}
 	}
@@ -1144,6 +1161,22 @@ ModalboxPayment.prototype.on = function (event, callback, add) {
 		} else {
 			this[eventName] = callback;
 		}
+	}
+};
+
+/**
+ * Set a hook being triggered on events
+ * @param event
+ * @param callback
+ */
+ModalboxPayment.prototype.hook = function (event, callback) {
+	if (typeof event === 'string') {
+		var eventName = 'on' + event.charAt(0).toUpperCase() + event.slice(1);
+
+		if(!this._isArray(this._hooks[eventName])) {
+			this._hooks[eventName] = [];
+		}
+		this._hooks[eventName].push(callback);
 	}
 };
 
