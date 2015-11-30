@@ -376,13 +376,21 @@ var ModalboxPayment = function (urls, window, options, config, events) {
 
 	// save viewport scale on start
 	this.view = '';
+	this.iframeReady = false;
 	this.ready = false;
 	this.loaded = false;
 	this.visible = false;
 	this.window.ModalboxPayment = this;
+
+	// explicitly trigger new tab feature?
+	if (typeof options.enableTab !== 'undefined') {
+		this.useTab = options.enableTab && this._supportsTabs();
+	}
+
 	this._responseHandlers = {};
 	this._storedValues = {};
 	this._hooks = {};
+	this._registerListener();
 };
 
 /********************** Internal setter methods  **************************/
@@ -507,7 +515,7 @@ ModalboxPayment.prototype._messageHandler = function (evt) {
 		modalbox._trigger('close', msgObject.data);
 	}
 	else if (msgObject.type === 'modalbox-iframe-ready') {
-		modalbox.ready = true;
+		modalbox.iframeReady = true;
 		modalbox._removeSpinner();
 		modalbox._maximizeIframe();
 
@@ -521,10 +529,15 @@ ModalboxPayment.prototype._messageHandler = function (evt) {
 		if (modalbox.visible) {
 			modalbox._initSession();
 
-			modalbox._postMessage(JSON.stringify({
-				type: 'modalbox-is-visible'
-			}), modalbox.iframe.contentWindow);
+			if (!modalbox.tab) {
+				modalbox._postMessage(JSON.stringify({
+					type: 'modalbox-is-visible'
+				}));
+			}
 		}
+
+		// trigger
+		modalbox._trigger('loaded', msgObject.data);
 	}
 	// on finished paytour
 	else if (msgObject.type === 'modalbox-success') {
@@ -541,9 +554,11 @@ ModalboxPayment.prototype._messageHandler = function (evt) {
 		}
 	}
 	else if (msgObject.type === 'modalbox-view-ready') {
-		modalbox._postMessage(JSON.stringify({
-			type: 'modalbox-is-visible'
-		}), modalbox.iframe.contentWindow);
+		if (!modalbox.tab) {
+			modalbox._postMessage(JSON.stringify({
+				type: 'modalbox-is-visible'
+			}));
+		}
 	}
 	// process action response
 	else if ((res = msgObject.type.match(/^modalbox-response-(.*)/))) {
@@ -569,10 +584,10 @@ ModalboxPayment.prototype._messageHandler = function (evt) {
 		opts.type = 'modalbox-additional-info';
 
 		// send additional parameters back
-		//modalbox._log('updating session');
-		modalbox._postMessage(JSON.stringify(opts), modalbox.iframe.contentWindow);
+		modalbox._postMessage(JSON.stringify(opts));
 
 		// paytour is ready with session
+		modalbox.ready = true;
 		modalbox._trigger('ready', {
 			modalbox: modalbox
 		});
@@ -606,31 +621,43 @@ ModalboxPayment.prototype._parseMessage = function (evtData) {
 	return (typeof obj.type === 'string') ? obj : null;
 };
 
+ModalboxPayment.prototype._updateState = function() {
+	if (this.ready) {
+		if(!this.iframe && (!this.tab || this.tab.closed === true)) {
+			this.ready = false;
+		}
+	}
+	if (this.loaded) {
+		if(!this.iframe && (!this.tab || this.tab.closed === true)) {
+			this.loaded = false;
+		}
+	}
+};
+
 // register event listener
 ModalboxPayment.prototype._registerListener = function () {
-	var that = this;
-
 	this._addEvent('message', this.window, this._messageHandler);
 };
 
 // restore Modalbox after previous extern redirect
 ModalboxPayment.prototype._restore = function (flow, view) {
+	this.useTab = false;
 	this.view = view;
 	this.options.flow = flow;
 	this._initIframe();
 	this._show();
 };
 
-ModalboxPayment.prototype._show = function (path) {
+ModalboxPayment.prototype._showIframe = function (path) {
 	var that = this;
 	this._showOverlay();
 	this._setParentViewport();
 
-	if (!this.ready) {
+	if (!this.iframeReady) {
 		this._initIframe();
 		this._showSpinner();
 		window.setTimeout(function() {
-			that._show(path);
+			that._showIframe(path);
 		}, 1000);
 		return false;
 	} else if(typeof path !== 'undefined' && path !== '') {
@@ -641,6 +668,32 @@ ModalboxPayment.prototype._show = function (path) {
 	this.visible = true;
 	this._initSession();
 	this.iframe.style.display = 'block';
+};
+
+ModalboxPayment.prototype._showTab = function (path) {
+	var that = this;
+	this.view = path;
+	this._openTab();
+
+	this.visible = true;
+	this._initSession();
+
+	this.on('ready', function() {
+		if(typeof path !== 'undefined' && path !== '') {
+			that._changeRoute('/' + path);
+		} else {
+			that._changeRoute(undefined);
+		}
+		return true;
+	}, 'append');
+};
+
+ModalboxPayment.prototype._show = function (path) {
+	if (!this.useTab) {
+		this._showIframe(path);
+	} else {
+		this._showTab(path);
+	}
 
 	this._trigger('afterShow', {
 		modalbox: this
@@ -651,13 +704,24 @@ ModalboxPayment.prototype._changeRoute = function (route) {
 	this._postMessage(JSON.stringify({
 		type: 'modalbox-change-route',
 		route: route
-	}), this.iframe.contentWindow);
+	}));
+};
+
+ModalboxPayment.prototype._openTab = function () {
+	var opts = this.options;
+	opts.tt = this.redirectToken;
+	opts.sview = this.view;
+	opts.lazy = 0;
+
+	// create URL with params
+	var url = this._generateUrl(this.baseUrl, opts, this.modConfig);
+
+	this.tab = this.window.open(url);
+	this.contentWindow = this.tab;
 };
 
 ModalboxPayment.prototype._initIframe = function () {
 	if (!this.iframe) {
-		this._registerListener();
-
 		var opts = this.options;
 		opts.tt = this.redirectToken;
 		opts.sview = this.view;
@@ -669,6 +733,7 @@ ModalboxPayment.prototype._initIframe = function () {
 		this.iframe = this._createIframe(url);
 
 		this.window.document.body.appendChild(this.iframe);
+		this.contentWindow = this.iframe.contentWindow;
 	}
 };
 
@@ -744,11 +809,13 @@ ModalboxPayment.prototype._supportsStyleAttr = function (elem, attribute, val){
 };
 
 ModalboxPayment.prototype._maximizeIframe = function () {
-	this.iframe.style.width = '100%';
-	this.iframe.style.height = '100%';
-	this.iframe.style.left = 0;
-	this.iframe.style.top = 0;
-	this.iframe.style.marginLeft = 0;
+	if (this.iframe) {
+		this.iframe.style.width = '100%';
+		this.iframe.style.height = '100%';
+		this.iframe.style.left = 0;
+		this.iframe.style.top = 0;
+		this.iframe.style.marginLeft = 0;
+	}
 };
 
 ModalboxPayment.prototype._updateOptions = function (options) {
@@ -863,7 +930,7 @@ ModalboxPayment.prototype._initSession = function () {
 	// init lazy loading session
 	this._postMessage(JSON.stringify({
 		type: 'modalbox-init-session'
-	}), this.iframe.contentWindow);
+	}));
 };
 
 // cross-browser event unregistration
@@ -918,7 +985,6 @@ ModalboxPayment.prototype._restoreParentViewport = function () {
 };
 
 ModalboxPayment.prototype._generateUrl = function (baseUrl, params, config) {
-	var ret = [];
 	var url = baseUrl;
 
 	// fix url, remove existing hashes
@@ -950,10 +1016,11 @@ ModalboxPayment.prototype._generateUrl = function (baseUrl, params, config) {
 	return url;
 };
 
-ModalboxPayment.prototype._postMessage = function (message, window, origin) {
+ModalboxPayment.prototype._postMessage = function (message, win, origin) {
 	origin = origin ? origin : '*';
+	win = win || this.contentWindow;
 
-	window.postMessage(message, origin);
+	win.postMessage(message, origin);
 };
 
 ModalboxPayment.prototype._log = function (message) {
@@ -964,6 +1031,10 @@ ModalboxPayment.prototype._log = function (message) {
 
 ModalboxPayment.prototype._isMobile = function () {
 	return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+};
+
+ModalboxPayment.prototype._supportsTabs = function () {
+	return this._isMobile() && !(/IEMobile/i.test(navigator.userAgent));
 };
 
 ModalboxPayment.prototype._isParentInFrame = function () {
@@ -1005,21 +1076,32 @@ ModalboxPayment.prototype._generateSuccessUrl = function () {
 ModalboxPayment.prototype._sendAction = function (actionKey, params) {
 	if (typeof actionKey === 'string') {
 		var that = this;
+		that._updateState();
+
 		var objToSend = {
 			type: 'modalbox-action-' + actionKey,
 			params: params
 		};
 
 		var sendCallback = function () {
-			that._postMessage(JSON.stringify(objToSend), that.iframe.contentWindow);
+			try {
+				that._postMessage(JSON.stringify(objToSend), that.contentWindow);
+			} catch(e) {}
 		};
 
-		if (that.loaded) {
+		if (that.ready) {
 			sendCallback();
 		} else {
 			var intSend = null;
+
+			if (that.useTab) {
+				that._initIframe();
+			}
+
 			intSend = window.setInterval(function () {
-				if (that.loaded) {
+				that._initSession();
+
+				if (that.ready) {
 					sendCallback();
 					window.clearInterval(intSend);
 				}
@@ -1042,6 +1124,15 @@ ModalboxPayment.prototype._trigger = function (event, params) {
 
 		if (typeof this[eventName] === 'function') {
 			return this[eventName](params);
+		} else if (this._isArray(this[eventName])) {
+			var i = this[eventName].length;
+			while (i--) {
+				var ret = this[eventName][i](params);
+
+				if (ret) {
+					this[eventName].splice(i, 1);
+				}
+			}
 		}
 	}
 };
@@ -1062,7 +1153,7 @@ ModalboxPayment.prototype._triggerHooks = function (eventName, params) {
 
 ModalboxPayment.prototype._isArray = function(obj) {
 	return (typeof obj !== 'undefined' &&
-	obj && obj.constructor === Array);
+		obj && obj.constructor === Array);
 };
 
 /******************* Public methods **************************/
@@ -1083,6 +1174,7 @@ ModalboxPayment.prototype.tryRestore = function () {
 	} else if (vxpOpen !== '') {
 		var methodName = 'open' + vxpOpen;
 
+		this.useTab = false;
 		if (typeof this[methodName] === 'function') {
 			this[methodName]();
 			retVal = true;
@@ -1098,7 +1190,9 @@ ModalboxPayment.prototype.tryRestore = function () {
  */
 ModalboxPayment.prototype.init = function (path) {
 	this.view = path || '';
-	this._initIframe();
+	if (!this.useTab) {
+		this._initIframe();
+	}
 };
 
 
@@ -1106,6 +1200,11 @@ ModalboxPayment.prototype.init = function (path) {
  * Hides Iframe and overlay on the page, restores viewport
  */
 ModalboxPayment.prototype.hide = function () {
+	this._hideIframe();
+	this._hideTab();
+};
+
+ModalboxPayment.prototype._hideIframe = function () {
 	if (this.iframe && this.visible) {
 		this.iframe.style.display = 'none';
 
@@ -1120,6 +1219,24 @@ ModalboxPayment.prototype.hide = function () {
 	}
 };
 
+ModalboxPayment.prototype._hideTab = function () {
+	if (this.tab) {
+		this.tab.close();
+
+		this._trigger('afterHide', {
+			modalbox: this
+		});
+
+		this.visible = false;
+		this._updateState();
+
+		if (this.iframe) {
+			this.iframe.src = this.iframe.src; // hack to reload iframe
+			this.contentWindow = this.iframe.contentWindow;
+		}
+	}
+};
+
 /**
  * Sends additional parameters to the Paytour through postMessages
  * @param options
@@ -1127,14 +1244,17 @@ ModalboxPayment.prototype.hide = function () {
 ModalboxPayment.prototype.sendOptions = function (options) {
 	if (typeof options  === 'object') {
 		var that = this;
+		that._updateState();
 		that._updateOptions(options);
 
 		var sendCallback = function () {
-			var params = {};
-			params.type = 'modalbox-update-params';
-			params.options = options;
-			that._postMessage(JSON.stringify(params), that.iframe.contentWindow);
-			that._updateOptions(options);
+			try {
+				var params = {};
+				params.type = 'modalbox-update-params';
+				params.options = options;
+				that._postMessage(JSON.stringify(params), that.contentWindow);
+				that._updateOptions(options);
+			} catch(e) {}
 		};
 
 		if (that.loaded) {
@@ -1147,6 +1267,13 @@ ModalboxPayment.prototype.sendOptions = function (options) {
 					window.clearInterval(intSend);
 				}
 			}, 500);
+		}
+
+		if (this.useTab) {
+			this.on('loaded', function() {
+				sendCallback();
+				return true;
+			}, 'append');
 		}
 	}
 };
@@ -1366,11 +1493,25 @@ ModalboxPayment.prototype.showPaytour = function (route) {
  * e.g.: 'success', 'close'
  * @param event
  * @param callback
+ * @param add
  */
-ModalboxPayment.prototype.on = function (event, callback) {
+ModalboxPayment.prototype.on = function (event, callback, add) {
 	if (typeof event === 'string') {
 		var eventName = 'on' + event.charAt(0).toUpperCase() + event.slice(1);
-		this[eventName] = callback;
+		if (add === 'append') {
+			if (!this._isArray(this[eventName])) {
+				var oldHandler = this[eventName];
+				this[eventName] = [];
+
+				if (oldHandler) {
+					this[eventName].push(oldHandler);
+				}
+			}
+
+			this[eventName].unshift(callback);
+		} else {
+			this[eventName] = callback;
+		}
 	}
 };
 
