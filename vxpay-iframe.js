@@ -361,6 +361,7 @@ ModalboxPayment.prototype._openTab = function () {
 	opts.tt = this.redirectToken;
 	opts.sview = this.view;
 	opts.lazy = 0;
+	opts.surl = this.optionsLazy.surl || this.options.surl;
 
 	// create URL with params
 	var url = this._generateUrl(this.baseUrl, opts, this.modConfig);
