@@ -572,6 +572,9 @@ ModalboxPayment.prototype._messageHandler = function (evt) {
 	else if (msgObject.type === 'modalbox-scrollto') {
 		modalbox._scrollTo(msgObject.data.top);
 	}
+	else if (msgObject.type === 'modalbox-hook') {
+		modalbox._trigger(msgObject.data.hook, msgObject.data);
+	}
 	// catch transfer_token
 	else if ((res = msgObject.type.match(/^redirect:(.*)/))) {
 		modalbox.window.location.href = res[1];
