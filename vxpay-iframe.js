@@ -1,4 +1,4 @@
-/** @version 1.3.20 */
+/** @version 1.3.21 */
 /*jshint strict:false */
 
 /**
@@ -1071,6 +1071,14 @@ ModalboxPayment.prototype.logout = function (resolve) {
 /** Checks if user is logged in and resolves callback */
 ModalboxPayment.prototype.isLoggedIn = function (resolve) {
 	var key = 'isLoggedIn';
+	this._registerResponseHandler(key, resolve);
+
+	this._sendAction(key);
+};
+
+/** Checks if login cookie has been set */
+ModalboxPayment.prototype.hasLoginCookie = function (resolve) {
+	var key = 'hasLoginCookie';
 	this._registerResponseHandler(key, resolve);
 
 	this._sendAction(key);
