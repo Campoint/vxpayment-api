@@ -1308,6 +1308,17 @@ ModalboxPayment.prototype.openPaytourByPaytype = function (paytype) {
 	this._show('');
 };
 
+
+/**
+ * Opens Modalbox Paytour with limit Workflow
+ */
+ModalboxPayment.prototype.openLimitPaytour = function () {
+	var flow = 'limit';
+	this.options.flow = 'limit';
+	this.sendOptions({ paytype: '', flow: flow});
+	this._show('');
+};
+
 /**
  * Open Paytour in abo flow
  */
