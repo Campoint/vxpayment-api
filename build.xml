@@ -107,14 +107,14 @@
 	</target>
 
 	<target name="version-tag">
-		<exec executable="node" resolveexecutable="true" outputproperty="apiVersion">
+		<exec executable="node" resolveexecutable="true" outputproperty="apiVersionNew">
 			<arg value="-e"/>
 			<arg value="console.log(require('${basedir}/bower.json').version);"/>
 		</exec>
 
 		<replaceregexp file="${basedir}/vxpay-iframe.js"
 					   match="(@version [0-9\.\-a-z]+)"
-					   replace="@version ${apiVersion}"
+					   replace="@version ${apiVersionNew}"
 					   byline="true"
 				/>
 	</target>
@@ -155,6 +155,7 @@
 			<arg value="tag"/>
 			<arg value="${libver}"/>
 		</exec>
+		<echo message="New version is ${libver}. You can now run: git push &amp; git push --tags " />
 	</target>
 
 	<target name="push">
