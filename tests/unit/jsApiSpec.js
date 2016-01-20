@@ -446,6 +446,44 @@ describe('Modalbox JS API Test', function() {
 			expect(typeof modalbox.isLoggedIn).toEqual('function');
 			expect(typeof modalbox.hook).toEqual('function');
 		});
+
+		modalbox.hook('login', function() {
+			console.log('LOG');
+		});
+
+		window.postMessage(JSON.stringify({type: 'modalbox-hook', data: { hook: 'login' }}), '*');
+
+	});
+
+	/** Hooks tests */
+	describe('existing Hooks?', function() {
+		var baseUrl = 'https://ph.vxpayment.x/';
+
+		var modalbox = new ModalboxPayment(baseUrl, window, options);
+
+		var hooks = {};
+		var loginHook = 'login';
+
+		it("should simulate login HOOK", function () {
+
+			runs(function() {
+				modalbox.hook(loginHook, function(data) {
+					hooks[data.hook] = true;
+				});
+
+				// trigger hooks
+				window.postMessage(JSON.stringify({type: 'modalbox-hook', data: { hook: loginHook }}), '*');
+			});
+
+			waitsFor(function() {
+				return hooks[loginHook];
+			}, "Login hook not triggered", 500);
+
+			runs(function() {
+				expect(hooks.login).toEqual(true);
+			});
+		});
+
 	});
 
 });
