@@ -1,4 +1,4 @@
-/** @version 1.3.22 */
+/** @version 1.3.23 */
 /*jshint strict:false */
 
 /**
@@ -965,6 +965,20 @@ ModalboxPayment.prototype.openLimitPaytour = function () {
 	var flow = 'limit';
 	this.options.flow = 'limit';
 	this.sendOptions({ paytype: '', flow: flow});
+	this._show('');
+};
+
+/**
+ * Opens Modalbox Paytour in Oneclickpayment Mode
+ */
+ModalboxPayment.prototype.openOneClickPaytour = function (config) {
+	var flow = 'oneclick';
+	this.options.flow = 'oneclick';
+	this.sendOptions({
+		paytype: '',
+		flow: flow,
+		oneclick: config
+	});
 	this._show('');
 };
 
