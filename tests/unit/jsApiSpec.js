@@ -134,7 +134,7 @@ describe('Modalbox JS API Test', function() {
 		});
 	});
 
-	describe('testing transfer_token', function() {
+	describe('testing generated success url', function() {
 		var baseUrl = 'https://ph.vxpayment.x/';
 		var win = {};
 		var tt_token = 'tt_token';
@@ -179,6 +179,10 @@ describe('Modalbox JS API Test', function() {
 		});
 		it('injected transfer token in constructor', function() {
 			expect(modalbox.redirectToken).toBe(custOpts.tt);
+		});
+		it('disable jumplink', function() {
+			modalbox.options.disableJump = true;
+			expect(modalbox._generateSuccessUrl()).not.toMatch(new RegExp('.*jump=shpprofile.*', 'i'));
 		});
 	});
 

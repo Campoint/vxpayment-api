@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.3.24 */
+/** @version 1.3.25 */
 /*jshint strict:false */
 
 /**
@@ -413,6 +413,7 @@ ModalboxPayment.prototype._setOptions = function (options) {
 	this.options.lang = options.lang || this.options.lang;
 	this.options.environment = options.environment || this.options.environment;
 	this.options.flow = options.flow || this.options.flow;
+	this.options.disableJump = options.disableJump || false;
 };
 
 ModalboxPayment.prototype._setOptionsLazy = function (options) {
@@ -1055,7 +1056,7 @@ ModalboxPayment.prototype._generateSuccessUrl = function () {
 
 	// set hostId
 	if (this.options.s) {
-		url += (url.indexOf('?') >= 0 ? '&' : '?') + 'jump=shpprofile&s=' + encodeURIComponent(this.options.s);
+		url += (url.indexOf('?') >= 0 ? '&' : '?') + (!this.options.disableJump ? 'jump=shpprofile&' : '') + 's=' + encodeURIComponent(this.options.s);
 	}
 
 	if (this.transferToken) {
