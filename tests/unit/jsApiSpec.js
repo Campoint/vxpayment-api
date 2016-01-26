@@ -181,7 +181,7 @@ describe('Modalbox JS API Test', function() {
 			expect(modalbox.redirectToken).toBe(custOpts.tt);
 		});
 		it('disable jumplink', function() {
-			modalbox.options.disableJump = true;
+			modalbox.optionsApi.disableJump = true;
 			expect(modalbox._generateSuccessUrl()).not.toMatch(new RegExp('.*jump=shpprofile.*', 'i'));
 		});
 	});

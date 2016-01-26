@@ -1,4 +1,4 @@
-/** @version 1.3.25 */
+/** @version 1.3.26 */
 /*jshint strict:false */
 
 /**
@@ -47,6 +47,7 @@ var ModalboxPayment = function (urls, window, options, config, events) {
 ModalboxPayment.prototype.setOptions = function (options) {
 	this._setOptions(options);
 	this._setOptionsLazy(options);
+	this._setOptionsApi(options);
 };
 
 ModalboxPayment.prototype._setOptions = function (options) {
@@ -62,7 +63,6 @@ ModalboxPayment.prototype._setOptions = function (options) {
 	this.options.lang = options.lang || this.options.lang;
 	this.options.environment = options.environment || this.options.environment;
 	this.options.flow = options.flow || this.options.flow;
-	this.options.disableJump = options.disableJump || false;
 };
 
 ModalboxPayment.prototype._setOptionsLazy = function (options) {
@@ -72,6 +72,12 @@ ModalboxPayment.prototype._setOptionsLazy = function (options) {
 	this.optionsLazy.ruri = options.ruri || this.window.location.href;
 	this.optionsLazy.surl = this.window.location.href;
 	this.optionsLazy.aurl = options.agbUrl;
+};
+
+ModalboxPayment.prototype._setOptionsApi = function (options) {
+	this.optionsApi = this.optionsApi || {};
+
+	this.optionsApi.disableJump = options.disableJump || false;
 };
 
 ModalboxPayment.prototype.setConfig = function (config) {
@@ -705,7 +711,7 @@ ModalboxPayment.prototype._generateSuccessUrl = function () {
 
 	// set hostId
 	if (this.options.s) {
-		url += (url.indexOf('?') >= 0 ? '&' : '?') + (!this.options.disableJump ? 'jump=shpprofile&' : '') + 's=' + encodeURIComponent(this.options.s);
+		url += (url.indexOf('?') >= 0 ? '&' : '?') + (!this.optionsApi.disableJump ? 'jump=shpprofile&' : '') + 's=' + encodeURIComponent(this.options.s);
 	}
 
 	if (this.transferToken) {
