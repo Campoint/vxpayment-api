@@ -36,6 +36,11 @@ var ModalboxPayment = function (urls, window, options, config, events) {
 		this.useTab = options.enableTab && this._supportsTabs();
 	}
 
+	// enforce a new tab instead of modalbox
+	if (typeof options.forceTab !== 'undefined') {
+		this.useTab = options.forceTab;
+	}
+
 	this._responseHandlers = {};
 	this._storedValues = {};
 	this._hooks = {};
