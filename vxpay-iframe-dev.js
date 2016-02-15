@@ -349,15 +349,7 @@
 
 }));
 /* jshint ignore:end */
-<<<<<<< 1ce70e27b573c1d1011549ee5c0e260b81ca9f6a
-/** @version 1.3.27 */
-=======
-<<<<<<< 2fdc4f45dfbe7aba672f8899c295474b3e9a3227
-/** @version 1.3.26 */
-=======
-/** @version 1.3.25 */
->>>>>>> Api build
->>>>>>> merge
+/** @version 1.3.28 */
 /*jshint strict:false */
 
 /**
