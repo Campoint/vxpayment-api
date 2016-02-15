@@ -127,6 +127,9 @@
 	</target>
 
 	<target name="release">
+		<exec executable="git" resolveexecutable="true" failonerror="true">
+			<arg value="pull"/>
+		</exec>
 		<exec executable="node" resolveexecutable="true" outputproperty="apiVersion">
 			<arg value="-e"/>
 			<arg value="console.log(require('${basedir}/bower.json').version);"/>
