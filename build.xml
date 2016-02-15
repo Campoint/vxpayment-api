@@ -158,7 +158,7 @@
 			<arg value="tag"/>
 			<arg value="${libver}"/>
 		</exec>
-		<echo message="New version is ${libver}. You can now run: git push &amp; git push --tags " />
+		<echo message="New version is ${libver}. You can now run: git push &amp;&amp; git push --tags " />
 	</target>
 
 	<target name="push">
