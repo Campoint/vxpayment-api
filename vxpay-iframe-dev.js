@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.3.28 */
+/** @version 1.3.29 */
 /*jshint strict:false */
 
 /**
@@ -381,6 +381,7 @@ var ModalboxPayment = function (urls, window, options, config, events) {
 	this.loaded = false;
 	this.visible = false;
 	this.window.ModalboxPayment = this;
+	this.tabTarget = '_blank';
 
 	// explicitly trigger new tab feature?
 	if (typeof options.enableTab !== 'undefined') {
@@ -390,6 +391,11 @@ var ModalboxPayment = function (urls, window, options, config, events) {
 	// enforce a new tab instead of modalbox
 	if (typeof options.forceTab !== 'undefined') {
 		this.useTab = options.forceTab;
+	}
+
+	// set target for new tab
+	if (typeof options.tabTarget !== 'undefined') {
+		this.tabTarget = options.tabTarget;
 	}
 
 	this._responseHandlers = {};
@@ -732,7 +738,7 @@ ModalboxPayment.prototype._openTab = function () {
 	// create URL with params
 	var url = this._generateUrl(this.baseUrl, opts, this.modConfig);
 
-	this.tab = this.window.open(url);
+	this.tab = this.window.open(url, this.tabTarget);
 	this.contentWindow = this.tab;
 };
 
