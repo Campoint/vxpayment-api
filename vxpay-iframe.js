@@ -384,6 +384,11 @@ ModalboxPayment.prototype._openTab = function () {
 	opts.lazy = 0;
 	opts.surl = this.optionsLazy.surl || this.options.surl;
 
+	// VXPay should replace the current URL?
+	if (this.tabTarget === '_top') {
+		opts.successUrl = this._generateSuccessUrl();
+	}
+
 	// create URL with params
 	var url = this._generateUrl(this.baseUrl, opts, this.modConfig);
 
