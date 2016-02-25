@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.3.29 */
+/** @version 1.3.30 */
 /*jshint strict:false */
 
 /**
@@ -734,6 +734,11 @@ ModalboxPayment.prototype._openTab = function () {
 	opts.sview = this.view;
 	opts.lazy = 0;
 	opts.surl = this.optionsLazy.surl || this.options.surl;
+
+	// VXPay should replace the current URL?
+	if (this.tabTarget === '_top') {
+		opts.successUrl = this._generateSuccessUrl();
+	}
 
 	// create URL with params
 	var url = this._generateUrl(this.baseUrl, opts, this.modConfig);
