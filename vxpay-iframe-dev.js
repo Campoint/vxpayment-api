@@ -1460,11 +1460,14 @@ ModalboxPayment.prototype.openSignup = function (opts) {
 };
 
 /** Logout current user */
-ModalboxPayment.prototype.logout = function (resolve) {
-	var key = 'logout';
-	this._registerResponseHandler(key, resolve);
+ModalboxPayment.prototype.logout = function (resolve, clearToken) {
+	var key    = 'logout';
+	var params = {
+		'clearToken' : typeof clearToken !== 'undefined' ? clearToken : false
+	};
 
-	this._sendAction(key);
+	this._registerResponseHandler(key, resolve);
+	this._sendAction(key, params);
 };
 
 /** Checks if user is logged in and resolves callback */
