@@ -966,7 +966,7 @@ ModalboxPayment.prototype.openPaytour = function (route, options) {
 		this.options.flow = flow;
 		var data = {
 			flow : this.options.flow
-		}
+		};
 
 		for (var key in options) {
 			if (!options.hasOwnProperty(key)) continue;
@@ -991,7 +991,7 @@ ModalboxPayment.prototype.openPaytourByPaytype = function (paytype, options) {
 	var data = {
 		flow    : this.options.flow,
 		paytype : paytype
-	}
+	};
 
 	for (var key in options) {
 		if (!options.hasOwnProperty(key)) continue;
@@ -1012,7 +1012,7 @@ ModalboxPayment.prototype.openLimitPaytour = function (options) {
 	var data = {
 		flow    : this.options.flow,
 		paytype : ''
-	}
+	};
 
 	for (var key in options) {
 		if (!options.hasOwnProperty(key)) continue;
@@ -1033,7 +1033,7 @@ ModalboxPayment.prototype.openOneClickPaytour = function (options) {
 	var data = {
 		flow    : this.options.flow,
 		paytype : ''
-	}
+	};
 
 	for (var key in options) {
 		if (!options.hasOwnProperty(key)) continue;
@@ -1053,7 +1053,7 @@ ModalboxPayment.prototype.openAboPaytour = function (options) {
 	this.options.flow = 'vipabo';
 	var data = {
 		flow : this.options.flow
-	}
+	};
 
 	for (var key in options) {
 		if (!options.hasOwnProperty(key)) continue;
@@ -1073,7 +1073,7 @@ ModalboxPayment.prototype.openVXTVAbo = function (options) {
 	this.options.flow = 'vxtvabo';
 	var data = {
 		flow : this.options.flow
-	}
+	};
 
 	for (var key in options) {
 		if (!options.hasOwnProperty(key)) continue;
@@ -1112,7 +1112,7 @@ ModalboxPayment.prototype.openChangeCreditcard = function (options) {
 	var data = {
 		flow    : this.options.flow,
 		paytype : 'CC'
-	}
+	};
 
 	for (var key in options) {
 		if (!options.hasOwnProperty(key)) continue;
@@ -1133,7 +1133,7 @@ ModalboxPayment.prototype.openSettings = function (options) {
 	var data = {
 		flow    : this.options.flow,
 		paytype : ''
-	}
+	};
 
 	for (var key in options) {
 		if (!options.hasOwnProperty(key)) continue;
@@ -1154,7 +1154,7 @@ ModalboxPayment.prototype.openVXSettings = function (options) {
 	var data = {
 		flow    : this.options.flow,
 		paytype : ''
-	}
+	};
 
 	for (var key in options) {
 		if (!options.hasOwnProperty(key)) continue;
@@ -1174,7 +1174,7 @@ ModalboxPayment.prototype.openPasswordReset = function (options) {
 	var data = {
 		flow        : 'pwdreset',
 		pwdresetKey : this._getGet('key')
-	}
+	};
 
 	for (var key in options) {
 		if (!options.hasOwnProperty(key)) continue;
@@ -1193,7 +1193,7 @@ ModalboxPayment.prototype.openPasswordReset = function (options) {
 ModalboxPayment.prototype.openLogin = function (options) {
 	var data = {
 		flow : 'login'
-	}
+	};
 
 	for (var key in options) {
 		if (!options.hasOwnProperty(key)) continue;
@@ -1212,7 +1212,7 @@ ModalboxPayment.prototype.openLogin = function (options) {
 ModalboxPayment.prototype.openSignup = function (options) {
 	var data = {
 		flow : 'login'
-	}
+	};
 
 	for (var key in options) {
 		if (!options.hasOwnProperty(key)) continue;
@@ -1259,7 +1259,7 @@ ModalboxPayment.prototype.openAVS = function (options) {
 	this.options.flow = 'avs';
 	var data = {
 		flow : this.options.flow
-	}
+	};
 
 	for (var key in options) {
 		if (!options.hasOwnProperty(key)) continue;
@@ -1280,7 +1280,7 @@ ModalboxPayment.prototype.openPromoCode = function (pc, options) {
 	var data = {
 		pc : typeof pc !== 'undefined' ? pc : null,
 		flow : 'promocode'
-	}
+	};
 
 	for (var key in options) {
 		if (!options.hasOwnProperty(key)) continue;
@@ -1299,7 +1299,7 @@ ModalboxPayment.prototype.openPromoCode = function (pc, options) {
 ModalboxPayment.prototype.openCarrier = function (options) {
 	var data = {
 		flow : 'carrier'
-	}
+	};
 
 	for (var key in options) {
 		if (!options.hasOwnProperty(key)) continue;
