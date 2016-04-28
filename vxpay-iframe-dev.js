@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.3.31 */
+/** @version 1.3.32 */
 /*jshint strict:false */
 
 /**
@@ -1307,13 +1307,24 @@ ModalboxPayment.prototype.sendOptions = function (options) {
 
 /**
  * Open paytour in MoneyCharge flow and show given route
+ *
+ * @param {string} route
+ * @param {object} options
  */
-ModalboxPayment.prototype.openPaytour = function (route) {
+ModalboxPayment.prototype.openPaytour = function (route, options) {
 	var flow = 'moneycharge'; /** TODO: Move into business logic **/
 	if (this.options.flow !== flow) {
 		this.options.flow = flow;
-		this.sendOptions({ flow: this.options.flow });
+		var data = {
+			flow : this.options.flow
+		}
 
+		for (var key in options) {
+			if (!options.hasOwnProperty(key)) continue;
+			data[key] = options[key];
+		}
+
+		this.sendOptions(data);
 		this._show(route ? route : 'payment');
 	} else {
 		this._show(route ? route : 'payment');
@@ -1322,55 +1333,105 @@ ModalboxPayment.prototype.openPaytour = function (route) {
 
 /**
  * Opens Modalbox Paytour with preselected paytype
- * @param paytype
+ *
+ * @param {string} route
+ * @param {object} options
  */
-ModalboxPayment.prototype.openPaytourByPaytype = function (paytype) {
-	var flow = 'moneycharge'; /** TODO: Move into business logic **/
-	this.options.flow = flow;
-	this.sendOptions({ paytype: paytype, flow: flow });
+ModalboxPayment.prototype.openPaytourByPaytype = function (paytype, options) {
+	this.options.flow = 'moneycharge'; /** TODO: Move into business logic **/
+	var data = {
+		flow    : this.options.flow,
+		paytype : paytype
+	}
+
+	for (var key in options) {
+		if (!options.hasOwnProperty(key)) continue;
+		data[key] = options[key];
+	}
+
+	this.sendOptions(data);
 	this._show('');
 };
 
-
 /**
  * Opens Modalbox Paytour with limit Workflow
+ *
+ * @param {object} options
  */
-ModalboxPayment.prototype.openLimitPaytour = function () {
-	var flow = 'limit';
+ModalboxPayment.prototype.openLimitPaytour = function (options) {
 	this.options.flow = 'limit';
-	this.sendOptions({ paytype: '', flow: flow});
+	var data = {
+		flow    : this.options.flow,
+		paytype : ''
+	}
+
+	for (var key in options) {
+		if (!options.hasOwnProperty(key)) continue;
+		data[key] = options[key];
+	}
+
+	this.sendOptions(data);
 	this._show('');
 };
 
 /**
  * Opens Modalbox Paytour in Oneclickpayment Mode
+ *
+ * @param {object} options
  */
-ModalboxPayment.prototype.openOneClickPaytour = function (config) {
-	var flow = 'oneclick';
+ModalboxPayment.prototype.openOneClickPaytour = function (options) {
 	this.options.flow = 'oneclick';
-	this.sendOptions({
-		paytype: '',
-		flow: flow,
-		oneclick: config
-	});
+	var data = {
+		flow    : this.options.flow,
+		paytype : ''
+	}
+
+	for (var key in options) {
+		if (!options.hasOwnProperty(key)) continue;
+		data[key] = options[key];
+	}
+
+	this.sendOptions(data);
 	this._show('');
 };
 
 /**
  * Open Paytour in abo flow
+ *
+ * @param {object} options
  */
-ModalboxPayment.prototype.openAboPaytour = function () {
+ModalboxPayment.prototype.openAboPaytour = function (options) {
 	this.options.flow = 'vipabo';
-	this.sendOptions({ flow: this.options.flow });
+	var data = {
+		flow : this.options.flow
+	}
+
+	for (var key in options) {
+		if (!options.hasOwnProperty(key)) continue;
+		data[key] = options[key];
+	}
+
+	this.sendOptions(data);
 	this._show('abo');
 };
 
 /**
  * Open Paytour in VXTV abo flow
+ *
+ * @param {object} options
  */
-ModalboxPayment.prototype.openVXTVAbo = function () {
+ModalboxPayment.prototype.openVXTVAbo = function (options) {
 	this.options.flow = 'vxtvabo';
-	this.sendOptions({ flow: this.options.flow });
+	var data = {
+		flow : this.options.flow
+	}
+
+	for (var key in options) {
+		if (!options.hasOwnProperty(key)) continue;
+		data[key] = options[key];
+	}
+
+	this.sendOptions(data);
 	this._show('abo');
 };
 
@@ -1394,68 +1455,122 @@ ModalboxPayment.prototype.getBalance = function (resolve) {
 
 /**
  * Open Paytour in Creditcard change flow
+ *
+ * @param {object} options
  */
-ModalboxPayment.prototype.openChangeCreditcard = function () {
+ModalboxPayment.prototype.openChangeCreditcard = function (options) {
 	this.options.flow = 'changecc';
-	this.sendOptions({ flow: this.options.flow, paytype: 'CC' });
+	var data = {
+		flow    : this.options.flow,
+		paytype : 'CC'
+	}
+
+	for (var key in options) {
+		if (!options.hasOwnProperty(key)) continue;
+		data[key] = options[key];
+	}
+
+	this.sendOptions(data);
 	this._show();
 };
 
 /**
  * Open Settings Flow
+ *
+ * @param {object} options
  */
-ModalboxPayment.prototype.openSettings = function () {
+ModalboxPayment.prototype.openSettings = function (options) {
 	this.options.flow = 'settings';
-	this.sendOptions({ flow: this.options.flow, paytype: '' });
+	var data = {
+		flow    : this.options.flow,
+		paytype : ''
+	}
+
+	for (var key in options) {
+		if (!options.hasOwnProperty(key)) continue;
+		data[key] = options[key];
+	}
+
+	this.sendOptions(data);
 	this._show();
 };
 
 /**
  * Open extended VX Settings Flow
+ *
+ * @param {object} options
  */
-ModalboxPayment.prototype.openVXSettings = function () {
+ModalboxPayment.prototype.openVXSettings = function (options) {
 	this.options.flow = 'vxsettings';
-	this.sendOptions({ flow: this.options.flow, paytype: '' });
+	var data = {
+		flow    : this.options.flow,
+		paytype : ''
+	}
+
+	for (var key in options) {
+		if (!options.hasOwnProperty(key)) continue;
+		data[key] = options[key];
+	}
+
+	this.sendOptions(data);
 	this._show();
 };
 
 /**
  * Open Password reset flow
+ *
+ * @param {object} options
  */
-ModalboxPayment.prototype.openPasswordReset = function () {
-	var sendOpts = {};
-	sendOpts.pwdresetKey = this._getGet('key');
-	sendOpts.flow = 'pwdreset';
+ModalboxPayment.prototype.openPasswordReset = function (options) {
+	var data = {
+		flow        : 'pwdreset',
+		pwdresetKey : this._getGet('key')
+	}
 
-	this.sendOptions(sendOpts);
+	for (var key in options) {
+		if (!options.hasOwnProperty(key)) continue;
+		data[key] = options[key];
+	}
+
+	this.sendOptions(data);
 	this._show();
 };
 
 /**
  * Open Paytour in Login flow
+ *
+ * @param {object} options
  */
-ModalboxPayment.prototype.openLogin = function (opts) {
-	var sendOpts = {};
-	if (typeof opts === 'object') {
-		sendOpts = opts;
+ModalboxPayment.prototype.openLogin = function (options) {
+	var data = {
+		flow : 'login'
 	}
 
-	sendOpts.flow = 'login';
-	this.sendOptions(sendOpts);
+	for (var key in options) {
+		if (!options.hasOwnProperty(key)) continue;
+		data[key] = options[key];
+	}
+
+	this.sendOptions(data);
 	this._show('login');
 };
 
 /**
  * Opens Signup in Login Flow
+ *
+ * @param {object} options
  */
-ModalboxPayment.prototype.openSignup = function (opts) {
-	var sendOpts = {};
-	if (typeof opts === 'object') {
-		sendOpts = opts;
+ModalboxPayment.prototype.openSignup = function (options) {
+	var data = {
+		flow : 'login'
 	}
 
-	sendOpts.flow = 'login';
-	this.sendOptions(sendOpts);
+	for (var key in options) {
+		if (!options.hasOwnProperty(key)) continue;
+		data[key] = options[key];
+	}
+
+	this.sendOptions(data);
 	this._show('signup');
 };
 
@@ -1488,38 +1603,61 @@ ModalboxPayment.prototype.hasLoginCookie = function (resolve) {
 
 /**
  * Opens AVS flow
+ *
+ * @param {object} options
  */
-ModalboxPayment.prototype.openAVS = function () {
+ModalboxPayment.prototype.openAVS = function (options) {
 	this.options.flow = 'avs';
-	this.sendOptions({ flow: this.options.flow });
+	var data = {
+		flow : this.options.flow
+	}
+
+	for (var key in options) {
+		if (!options.hasOwnProperty(key)) continue;
+		data[key] = options[key];
+	}
+
+	this.sendOptions(data);
 	this._show('avs');
 };
 
 /**
  * Opens PromoCode
+ *
+ * @param {object} pc
+ * @param {object} options
  */
-ModalboxPayment.prototype.openPromoCode = function (opts) {
-	var sendOpts = {};
-	if (typeof opts === 'object') {
-		sendOpts = opts;
+ModalboxPayment.prototype.openPromoCode = function (pc, options) {
+	var data = {
+		pc : typeof pc !== 'undefined' ? pc : null,
+		flow : 'promocode'
 	}
 
-	sendOpts.flow = 'promocode';
-	this.sendOptions(sendOpts);
+	for (var key in options) {
+		if (!options.hasOwnProperty(key)) continue;
+		data[key] = options[key];
+	}
+
+	this.sendOptions(data);
 	this._show('promocode');
 };
 
 /**
  * Opens Carrier Flow
+ *
+ * @param {object} options
  */
-ModalboxPayment.prototype.openCarrier = function (opts) {
-	var sendOpts = {};
-	if (typeof opts === 'object') {
-		sendOpts = opts;
+ModalboxPayment.prototype.openCarrier = function (options) {
+	var data = {
+		flow : 'carrier'
 	}
 
-	sendOpts.flow = 'carrier';
-	this.sendOptions(sendOpts);
+	for (var key in options) {
+		if (!options.hasOwnProperty(key)) continue;
+		data[key] = options[key];
+	}
+
+	this.sendOptions(data);
 	this._show('carrier');
 };
 
