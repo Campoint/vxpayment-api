@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.3.34 */
+/** @version 1.3.35 */
 /*jshint strict:false */
 
 /**
@@ -922,6 +922,13 @@ ModalboxPayment.prototype._removeSpinner = function () {
 	}
 };
 
+ModalboxPayment.prototype._removeIframe = function () {
+	if (this.iframe) {
+		this.iframe.parentNode.removeChild(this.iframe);
+		this.iframe = null;
+	}
+};
+
 ModalboxPayment.prototype._showSpinner = function () {
 	if(!this.spinner) {
 		this.spinner = this._createSpinner();
@@ -1233,8 +1240,6 @@ ModalboxPayment.prototype.hide = function () {
 
 ModalboxPayment.prototype._hideIframe = function () {
 	if (this.iframe && this.visible) {
-		this.iframe.style.display = 'none';
-
 		this._trigger('afterHide', {
 			modalbox: this
 		});
@@ -1242,7 +1247,9 @@ ModalboxPayment.prototype._hideIframe = function () {
 		this._restoreParentViewport();
 		this._removeOverlay();
 		this._removeSpinner();
+		this._removeIframe();
 		this.visible = false;
+		this.iframeReady = false;
 	}
 };
 
