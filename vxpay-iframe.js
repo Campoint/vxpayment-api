@@ -1,4 +1,4 @@
-/** @version 1.3.35 */
+/** @version 1.3.36 */
 /*jshint strict:false */
 
 /**
@@ -81,7 +81,7 @@ ModalboxPayment.prototype._setOptionsLazy = function (options) {
 
 	this.optionsLazy.ref = options.ref || this.window.document.referrer;
 	this.optionsLazy.ruri = options.ruri || this.window.location.href;
-	this.optionsLazy.surl = this.window.location.href;
+	this.optionsLazy.surl = options.surl || this.window.location.href;
 	this.optionsLazy.aurl = options.agbUrl;
 };
 
@@ -736,7 +736,6 @@ ModalboxPayment.prototype._generateSuccessUrl = function () {
 	if (this.options.s) {
 		url += (url.indexOf('?') >= 0 ? '&' : '?') + (!this.optionsApi.disableJump ? 'jump=shpprofile&' : '') + 's=' + encodeURIComponent(this.options.s);
 	}
-
 	if (this.transferToken) {
 		url += (url.indexOf('?') >= 0 ? '&' : '?') + 'transfer_token=' + encodeURIComponent(this.transferToken);
 	}
