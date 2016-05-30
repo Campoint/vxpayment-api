@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.3.36 */
+/** @version 1.3.37 */
 /*jshint strict:false */
 
 /**
@@ -1469,6 +1469,28 @@ ModalboxPayment.prototype.openChangeCreditcard = function (options) {
 	var data = {
 		flow    : this.options.flow,
 		paytype : 'CC'
+	};
+
+	for (var key in options) {
+		if (!options.hasOwnProperty(key)) continue;
+		data[key] = options[key];
+	}
+
+	this.sendOptions(data);
+	this._show();
+};
+
+/**
+ * Open Paytour in Lastschrift change flow
+ *
+ * @param {object} options
+ * @param {boolean} isAbo
+ */
+ModalboxPayment.prototype.openChangeLastschrift = function (options) {
+	this.options.flow = 'changels';
+	var data = {
+		flow    : this.options.flow,
+		paytype : 'LS'
 	};
 
 	for (var key in options) {
