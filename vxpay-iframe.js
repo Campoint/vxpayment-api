@@ -83,6 +83,7 @@ ModalboxPayment.prototype._setOptionsLazy = function (options) {
 	this.optionsLazy.ruri = options.ruri || this.window.location.href;
 	this.optionsLazy.surl = options.surl || this.window.location.href;
 	this.optionsLazy.aurl = options.agbUrl;
+	this.optionsLazy.purl = this.window.location.href;
 };
 
 ModalboxPayment.prototype._setOptionsApi = function (options) {
