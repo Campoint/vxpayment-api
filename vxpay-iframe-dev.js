@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.3.38 */
+/** @version 1.3.39 */
 /*jshint strict:false */
 
 /**
@@ -961,10 +961,13 @@ ModalboxPayment.prototype._addEvent = function (evnt, elem, func) {
 	}
 };
 
-ModalboxPayment.prototype._initSession = function () {
+ModalboxPayment.prototype._initSession = function (token) {
+	token = token || null;
+
 	// init lazy loading session
 	this._postMessage(JSON.stringify({
-		type: 'modalbox-init-session'
+		type: 'modalbox-init-session',
+		token: token
 	}));
 };
 
@@ -1229,6 +1232,13 @@ ModalboxPayment.prototype.init = function (path) {
 	}
 };
 
+/**
+ * Init the session with a given token
+ * @param token
+ */
+ModalboxPayment.prototype.loadSessionWithExternalToken = function (token) {
+	this._initSession(token);
+};
 
 /**
  * Hides Iframe and overlay on the page, restores viewport
