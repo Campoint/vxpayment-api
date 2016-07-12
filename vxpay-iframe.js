@@ -230,7 +230,7 @@ ModalboxPayment.prototype._messageHandler = function (evt) {
 	}
 	// process action response
 	else if ((res = msgObject.type.match(/^modalbox-response-(.*)/))) {
-		if (typeof modalbox._responseHandlers[res[1]] !== 'undefined') {
+		if (modalbox._responseHandlers[res[1]]) {
 			if (typeof modalbox._responseHandlers[res[1]].resolve === 'function') {
 				modalbox._responseHandlers[res[1]].resolve(msgObject.data);
 			}
