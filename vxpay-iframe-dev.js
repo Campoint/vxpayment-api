@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.4.0 */
+/** @version 1.4.1 */
 /*jshint strict:false */
 
 (function(window) {
@@ -1132,9 +1132,8 @@
 			} else {
 				var intSend = null;
 
-				if (that.useTab) {
-					that._initIframe();
-				}
+				// always init iframe - e.g. if previously closed
+				that._initIframe();
 
 				intSend = window.setInterval(function () {
 					that._initSession();
