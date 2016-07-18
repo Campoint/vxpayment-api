@@ -166,7 +166,7 @@
 	 */
 	ModalboxPayment.prototype._messageHandler = function (evt) {
 		var res = null;
-		var modalbox = this;
+		var modalbox = window.ModalboxPayment;
 
 		// serialized data?
 		var msgObject = modalbox._parseMessage(evt.data);
