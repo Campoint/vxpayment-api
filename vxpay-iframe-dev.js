@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.4.1 */
+/** @version 1.4.2 */
 /*jshint strict:false */
 
 (function(window) {
@@ -517,7 +517,7 @@
 	 */
 	ModalboxPayment.prototype._messageHandler = function (evt) {
 		var res = null;
-		var modalbox = this;
+		var modalbox = window.ModalboxPayment;
 
 		// serialized data?
 		var msgObject = modalbox._parseMessage(evt.data);
