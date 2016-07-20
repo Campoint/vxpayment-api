@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.4.2 */
+/** @version 1.4.3 */
 /*jshint strict:false */
 
 (function(window) {
@@ -1666,9 +1666,8 @@
 	 * @param {object} pc
 	 * @param {object} options
 	 */
-	ModalboxPayment.prototype.openPromoCode = function (pc, options) {
+	ModalboxPayment.prototype.openPromoCode = function (options) {
 		var data = {
-			pc : typeof pc !== 'undefined' ? pc : null,
 			flow : 'promocode'
 		};
 
