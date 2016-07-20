@@ -1315,9 +1315,8 @@
 	 * @param {object} pc
 	 * @param {object} options
 	 */
-	ModalboxPayment.prototype.openPromoCode = function (pc, options) {
+	ModalboxPayment.prototype.openPromoCode = function (options) {
 		var data = {
-			pc : typeof pc !== 'undefined' ? pc : null,
 			flow : 'promocode'
 		};
 
