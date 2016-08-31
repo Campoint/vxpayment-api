@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.4.3 */
+/** @version 1.4.4 */
 /*jshint strict:false */
 
 (function(window) {
@@ -383,6 +383,7 @@
 		this.visible = false;
 		this.window.ModalboxPayment = this;
 		this.tabTarget = '_blank';
+		this.overlayShow = true;
 
 		// explicitly trigger new tab feature?
 		if (typeof options.enableTab !== 'undefined') {
@@ -760,7 +761,6 @@
 			var url = this._generateUrl(this.baseUrl, opts, this.modConfig);
 
 			this.iframe = this._createIframe(url);
-
 			this.window.document.body.appendChild(this.iframe);
 			this.contentWindow = this.iframe.contentWindow;
 		}
@@ -857,7 +857,7 @@
 		var div = this.window.document.createElement('div');
 		div.id = this.spinnerId;
 
-		div.style.cssText = 'position:  absolute;' +
+		div.style.cssText = 'position:  fixed;' +
 			'width: 140px;' +
 			'height: 140px;' +
 			'background: #000;' +
@@ -939,7 +939,7 @@
 	};
 
 	ModalboxPayment.prototype._showOverlay = function () {
-		if(!this.overlay) {
+		if(!this.overlay && this.overlayShow) {
 			this.overlay = this._createOverlay();
 			this.window.document.body.appendChild(this.overlay);
 		}
@@ -1058,7 +1058,6 @@
 	ModalboxPayment.prototype._postMessage = function (message, win, origin) {
 		origin = origin ? origin : '*';
 		win = win || this.contentWindow;
-
 		win.postMessage(message, origin);
 	};
 
@@ -1401,6 +1400,28 @@
 		var data = {
 			flow    : this.options.flow,
 			paytype : ''
+		};
+
+		for (var key in options) {
+			if (!options.hasOwnProperty(key)) continue;
+			data[key] = options[key];
+		}
+
+		this.sendOptions(data);
+		this._show('');
+	};
+
+	/**
+	 * Opens Modalbox Paytour in AutoRecharge Mode
+	 *
+	 * @param {object} options
+	 */
+	ModalboxPayment.prototype.openAutoRechargePaytour = function (options) {
+		this.options.flow = 'autorecharge';
+		this.useTab	= false;
+
+		var data = {
+			flow    : this.options.flow
 		};
 
 		for (var key in options) {
