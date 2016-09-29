@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.4.4 */
+/** @version 1.4.5 */
 /*jshint strict:false */
 
 (function(window) {
@@ -443,6 +443,7 @@
 		this.optionsApi = this.optionsApi || {};
 
 		this.optionsApi.disableJump = options.disableJump || false;
+		this.optionsApi.hideIframe  = options.hideIframe || false;
 	};
 
 	ModalboxPayment.prototype.setConfig = function (config) {
@@ -1256,9 +1257,13 @@
 			this._restoreParentViewport();
 			this._removeOverlay();
 			this._removeSpinner();
-			this._removeIframe();
+			if (this.optionsApi.hideIframe) {
+				this.iframe.style.display = 'none';
+			} else {
+				this._removeIframe();
+				this.iframeReady = false;
+			}
 			this.visible = false;
-			this.iframeReady = false;
 		}
 	};
 
