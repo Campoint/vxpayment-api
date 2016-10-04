@@ -85,6 +85,7 @@
 		this.optionsLazy.ruri = options.ruri || this.window.location.href;
 		this.optionsLazy.surl = options.surl || this.window.location.href;
 		this.optionsLazy.aurl = options.agbUrl;
+		this.optionsLazy.prurl = options.privacyUrl;
 		this.optionsLazy.purl = this.window.location.href;
 	};
 
