@@ -491,7 +491,7 @@
 	ModalboxPayment.prototype._maximizeIframe = function () {
 		if (this.iframe) {
 			this.iframe.style.width = '100%';
-			this.iframe.style.height = '100%';
+			this.iframe.style.height = this.options.flow === 'autorecharge' ? '100vh' : '100%'; // fix for modern mobile Chrome on autoRecharge flow
 			this.iframe.style.left = 0;
 			this.iframe.style.top = 0;
 			this.iframe.style.marginLeft = 0;
