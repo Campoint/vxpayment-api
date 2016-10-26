@@ -709,7 +709,10 @@
 	ModalboxPayment.prototype._postMessage = function (message, win, origin) {
 		origin = origin ? origin : '*';
 		win = win || this.contentWindow;
-		win.postMessage(message, origin);
+
+		if (win) {
+			win.postMessage(message, origin);
+		}
 	};
 
 	ModalboxPayment.prototype._log = function (message) {
@@ -887,6 +890,7 @@
 	 * @param token
 	 */
 	ModalboxPayment.prototype.loadSessionWithExternalToken = function (token) {
+		this.redirectToken = token;
 		this._initSession(token);
 	};
 

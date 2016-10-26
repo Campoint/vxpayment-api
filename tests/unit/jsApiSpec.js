@@ -138,6 +138,7 @@ describe('Modalbox JS API Test', function() {
 
 		var custOpts = shallowCopy(options);
 		custOpts.at = 'TOK_access_token';
+		var paramToken = 'TOK_via_param';
 
 		var modalbox = new ModalboxPayment(baseUrl, win, custOpts);
 
@@ -160,6 +161,11 @@ describe('Modalbox JS API Test', function() {
 		});
 		it('injecting access token as redirect token', function() {
 			expect(modalbox.redirectToken).toBe(custOpts.at);
+		});
+		it('injecting access token as redirect token', function() {
+			modalbox.loadSessionWithExternalToken(paramToken);
+
+			expect(modalbox.redirectToken).toBe(paramToken);
 		});
 	});
 
