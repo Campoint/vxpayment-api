@@ -145,9 +145,11 @@
 	ModalboxPayment.prototype._setDefaultEvents = function () {
 		if (typeof this.onAfterShow !== 'function') {
 			this.on('afterShow', function (event) {
-				// store orig. overflow and set new
-				event.modalbox._storedValues.parentBodyOverflow = this.window.document.body.style.overflow;
-				event.modalbox.window.document.body.style.overflow = 'hidden';
+				if (!this.useTab) {
+					// store orig. overflow and set new
+					event.modalbox._storedValues.parentBodyOverflow = this.window.document.body.style.overflow;
+					event.modalbox.window.document.body.style.overflow = 'hidden';
+				}
 
 				// scroll parent to top - for mobiles
 				event.modalbox._scrollTo(1);
@@ -155,9 +157,11 @@
 		}
 		if (typeof this.onAfterHide !== 'function') {
 			this.on('afterHide', function (event) {
-				// restore overflow on body
-				if (typeof event.modalbox._storedValues.parentBodyOverflow !== 'undefined') {
-					event.modalbox.window.document.body.style.overflow = event.modalbox._storedValues.parentBodyOverflow;
+				if (!this.useTab) {
+					// restore overflow on body
+					if (typeof event.modalbox._storedValues.parentBodyOverflow !== 'undefined') {
+						event.modalbox.window.document.body.style.overflow = event.modalbox._storedValues.parentBodyOverflow;
+					}
 				}
 			});
 		}
