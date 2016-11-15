@@ -1384,6 +1384,25 @@
 	};
 
 	/**
+	 * Open Open Collections compensation flow
+	 *
+	 * @param {object} options
+	 */
+	ModalboxPayment.prototype.openOPCompensation = function (options) {
+		var data = {
+			flow : 'opcompensation'
+		};
+
+		for (var key in options) {
+			if (!options.hasOwnProperty(key)) continue;
+			data[key] = options[key];
+		}
+
+		this.sendOptions(data);
+		this._show('');
+	};
+
+	/**
 	 * Returns user's AVS status
 	 */
 	ModalboxPayment.prototype.getAVSStatus = function (resolve) {

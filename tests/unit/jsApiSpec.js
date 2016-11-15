@@ -481,6 +481,7 @@ describe('Modalbox JS API Test', function() {
 			expect(typeof modalbox.openVXSettings).toEqual('function');
 			expect(typeof modalbox.openPromoCode).toEqual('function');
 			expect(typeof modalbox.openPasswordReset).toEqual('function');
+			expect(typeof modalbox.openOPCompensation).toEqual('function');
 			expect(typeof modalbox.logout).toEqual('function');
 			expect(typeof modalbox.isLoggedIn).toEqual('function');
 			expect(typeof modalbox.hook).toEqual('function');
