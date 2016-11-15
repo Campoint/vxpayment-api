@@ -1399,7 +1399,7 @@
 		}
 
 		this.sendOptions(data);
-		this._show('');
+		this._show('opcompensation');
 	};
 
 	/**

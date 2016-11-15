@@ -15,3 +15,4 @@ phpunit.xml
 *.lint
 node_modules
 http-root
+.ant-targets-build.xml
