@@ -1,4 +1,4 @@
-/** @version 1.4.10 */
+/** @version 1.4.11 */
 /*jshint strict:false */
 
 (function(window) {
