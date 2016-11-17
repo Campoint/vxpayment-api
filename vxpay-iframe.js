@@ -906,16 +906,26 @@
 		this._hideTab();
 	};
 
-	ModalboxPayment.prototype._hideIframe = function () {
-		if (this.iframe && this.visible) {
-			this._trigger('afterHide', {
-				modalbox: this
-			});
+	/**
+	 * Always hide AND remove Iframe from DOM or close tab
+	 */
+	ModalboxPayment.prototype.remove = function () {
+		this._hideIframe(true);
+		this._hideTab();
+	};
+
+	ModalboxPayment.prototype._hideIframe = function (remove) {
+		if (this.iframe && (this.visible || remove)) {
+			if (this.visible) {
+				this._trigger('afterHide', {
+					modalbox: this
+				});
+			}
 
 			this._restoreParentViewport();
 			this._removeOverlay();
 			this._removeSpinner();
-			if (this.optionsApi.hideIframe) {
+			if (this.optionsApi.hideIframe && !remove) {
 				this.iframe.style.display = 'none';
 			} else {
 				this._removeIframe();
