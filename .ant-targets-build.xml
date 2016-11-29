@@ -1,0 +1,6 @@
+clean
+compressjs
+deleteBuild
+dev
+gettext
+init
