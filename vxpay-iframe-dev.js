@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.4.12 */
+/** @version 1.4.13 */
 /*jshint strict:false */
 
 (function(window) {
@@ -427,6 +427,7 @@
 		this.options.lang = options.lang || this.options.lang;
 		this.options.environment = options.environment || this.options.environment;
 		this.options.flow = options.flow || this.options.flow;
+		this.options.showOAuth = options.showOAuth || this.options.showOAuth;
 	};
 
 	ModalboxPayment.prototype._setOptionsLazy = function (options) {
