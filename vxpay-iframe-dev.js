@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.4.13 */
+/** @version 1.4.14 */
 /*jshint strict:false */
 
 (function(window) {
@@ -385,14 +385,17 @@
 		this.tabTarget = '_blank';
 		this.overlayShow = true;
 
+		this.useTab = false;
+		this.useTabDefault = false;
+
 		// explicitly trigger new tab feature?
 		if (typeof options.enableTab !== 'undefined') {
-			this.useTab = options.enableTab && this._supportsTabs();
+			this._setUseTab(options.enableTab && this._supportsTabs(), true);
 		}
 
 		// enforce a new tab instead of modalbox
 		if (typeof options.forceTab !== 'undefined') {
-			this.useTab = options.forceTab;
+			this._setUseTab(options.forceTab, true);
 		}
 
 		// set target for new tab
@@ -448,6 +451,23 @@
 		this.optionsApi.hideIframe  = options.hideIframe || false;
 	};
 
+	ModalboxPayment.prototype._getUseTab = function (resetToPermanent) {
+		resetToPermanent = resetToPermanent || false;
+		if (resetToPermanent) {
+			this._setUseTab(this.useTabDefault);
+		}
+
+		return this.useTab;
+	};
+
+	ModalboxPayment.prototype._setUseTab = function (useTab, permanent) {
+		permanent = permanent || false;
+		if (permanent) {
+			this.useTabDefault = useTab;
+		}
+		this.useTab = useTab;
+	};
+
 	ModalboxPayment.prototype.setConfig = function (config) {
 		this.modConfig = config || {};
 		this.modConfig.parentInFrame = this._isParentInFrame();
@@ -497,7 +517,7 @@
 	ModalboxPayment.prototype._setDefaultEvents = function () {
 		if (typeof this.onAfterShow !== 'function') {
 			this.on('afterShow', function (event) {
-				if (!this.useTab) {
+				if (!this._getUseTab()) {
 					// store orig. overflow and set new
 					event.modalbox._storedValues.parentBodyOverflow = this.window.document.body.style.overflow;
 					event.modalbox.window.document.body.style.overflow = 'hidden';
@@ -509,7 +529,7 @@
 		}
 		if (typeof this.onAfterHide !== 'function') {
 			this.on('afterHide', function (event) {
-				if (!this.useTab) {
+				if (!this._getUseTab()) {
 					// restore overflow on body
 					if (typeof event.modalbox._storedValues.parentBodyOverflow !== 'undefined') {
 						event.modalbox.window.document.body.style.overflow = event.modalbox._storedValues.parentBodyOverflow;
@@ -672,7 +692,7 @@
 
 	// restore Modalbox after previous extern redirect
 	ModalboxPayment.prototype._restore = function (flow, view) {
-		this.useTab = false;
+		this._setUseTab(false, true);
 		this.view = view;
 		this.options.flow = flow;
 		this._initIframe();
@@ -719,8 +739,12 @@
 		}, 'append');
 	};
 
-	ModalboxPayment.prototype._show = function (path) {
-		if (!this.useTab) {
+	ModalboxPayment.prototype._show = function (path, resetUseTab) {
+		if (typeof resetUseTab === 'undefined') {
+			resetUseTab = true;
+		}
+
+		if (!this._getUseTab(resetUseTab)) {
 			this._showIframe(path);
 		} else {
 			this._showTab(path);
@@ -1220,7 +1244,7 @@
 		} else if (vxpOpen !== '') {
 			var methodName = 'open' + vxpOpen;
 
-			this.useTab = false;
+			this._setUseTab(false, true);
 			if (typeof this[methodName] === 'function') {
 				this[methodName]();
 				retVal = true;
@@ -1236,7 +1260,7 @@
 	 */
 	ModalboxPayment.prototype.init = function (path) {
 		this.view = path || '';
-		if (!this.useTab) {
+		if (!this._getUseTab()) {
 			this._initIframe();
 		}
 	};
@@ -1337,7 +1361,7 @@
 				}, 500);
 			}
 
-			if (this.useTab) {
+			if (this._getUseTab()) {
 				this.on('loaded', function() {
 					sendCallback();
 					return true;
@@ -1443,7 +1467,7 @@
 	 */
 	ModalboxPayment.prototype.openAutoRechargePaytour = function (options) {
 		this.options.flow = 'autorecharge';
-		this.useTab	= false;
+		this._setUseTab(false);
 
 		var data = {
 			flow    : this.options.flow
@@ -1455,7 +1479,7 @@
 		}
 
 		this.sendOptions(data);
-		this._show('');
+		this._show('', false);
 	};
 
 	/**
