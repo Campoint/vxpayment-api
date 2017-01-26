@@ -212,7 +212,7 @@
 			modalbox._trigger('close', msgObject.data);
 		}
 		else if (msgObject.type === 'modalbox-iframe-ready') {
-			modalbox.iframeReady = true;
+			modalbox.iframeReady = !this._getUseTab();
 			modalbox._removeSpinner();
 			modalbox._maximizeIframe();
 
@@ -251,7 +251,7 @@
 			}
 		}
 		else if (msgObject.type === 'modalbox-view-ready') {
-			if (!modalbox.tab) {
+			if (!modalbox.tab || modalbox.tab.closed) {
 				modalbox._postMessage(JSON.stringify({
 					type: 'modalbox-is-visible'
 				}));
