@@ -1281,8 +1281,10 @@
 	 */
 	ModalboxPayment.prototype.openPasswordReset = function (options) {
 		var data = {
-			flow        : 'pwdreset',
-			pwdresetKey : this._getGet('key')
+			flow:             'pwdreset',
+			pwdresetUserId:   this._getGet('u'),
+			pwdresetUserName: this._getGet('tpLoginPwdLost'),
+			pwdresetKey:      this._getGet('key')
 		};
 
 		for (var key in options) {
