@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.4.16 */
+/** @version 1.4.17 */
 /*jshint strict:false */
 
 (function(window) {
@@ -1377,9 +1377,11 @@
 	 * @param {object} options
 	 */
 	ModalboxPayment.prototype.openPaytour = function (route, options) {
-		var flow = 'moneycharge'; /** TODO: Move into business logic **/
-		if (this.options.flow !== flow) {
-			this.options.flow = flow;
+		var flow           = 'moneycharge';
+		var shouldSendOpts = this.options.flow !== flow || typeof options !== 'undefined';
+		this.options.flow  = flow;
+
+		if (shouldSendOpts) {
 			var data = {
 				flow : this.options.flow
 			};
