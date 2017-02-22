@@ -38,7 +38,6 @@
 	<!-- Release Tasks -->
 	<target name="deleteBuild" description="Deletes generated versions">
 		<delete file="${basedir}/vxpay-iframe-api.min.js"/>
-		<delete file="${basedir}/vxpay-iframe-rc-api.min.js"/>
 		<delete file="${basedir}/vxpay-iframe.min.js"/>
 		<delete file="${basedir}/vxpay-iframe-dev.js"/>
 	</target>
@@ -51,13 +50,6 @@
 			<arg value="-o"/>
 			<arg value="${basedir}/vxpay-iframe-api.min.js"/>
 		</exec>
-		<exec dir="${basedir}" executable="${uglifyjs}">
-			<arg value="${basedir}/vxpay-iframe-rc.js"/>
-			<arg value="--comments"/>
-			<arg value="/version/"/>
-			<arg value="-o"/>
-			<arg value="${basedir}/vxpay-iframe-rc-api.min.js"/>
-		</exec>
 	</target>
 
 	<target name="dev" description="Installs all packages for development" depends="dev-npm">
@@ -66,11 +58,6 @@
 			<arg value="-s"/>
 			<arg path="${basedir}/vxpay-iframe.js"/>
 			<arg path="${basedir}/http-root/vxpay-iframe.js"/>
-		</exec>
-		<exec executable="ln">
-			<arg value="-s"/>
-			<arg path="${basedir}/vxpay-iframe-rc.js"/>
-			<arg path="${basedir}/http-root/vxpay-iframe-rc.js"/>
 		</exec>
 		<exec executable="ln">
 			<arg value="-s"/>
