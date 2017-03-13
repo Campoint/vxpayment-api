@@ -595,7 +595,8 @@
 				modalbox.hide();
 			} else {
 				// update options
-				modalbox.options.s = typeof msgObject.data === 'object' ? msgObject.data.hostId : modalbox.options.s;
+				modalbox.options.s     = typeof msgObject.data === 'object' ? msgObject.data.hostId : modalbox.options.s;
+				modalbox.options.uhash = typeof msgObject.data === 'object' ? msgObject.data.uhash : null;
 
 				modalbox.window.location.href = modalbox._generateSuccessUrl();
 				modalbox.hide();
@@ -1125,7 +1126,10 @@
 		if (this.options.s) {
 			url += (url.indexOf('?') >= 0 ? '&' : '?') + (!this.optionsApi.disableJump ? 'jump=shpprofile&' : '') + 's=' + encodeURIComponent(this.options.s);
 		}
-		if (this.transferToken) {
+		// either use user hash or transfer token
+		if (this.options.uhash) {
+			url += (url.indexOf('?') >= 0 ? '&' : '?') + 'uhash=' + encodeURIComponent(this.options.uhash);
+		} else if (this.transferToken) {
 			url += (url.indexOf('?') >= 0 ? '&' : '?') + 'transfer_token=' + encodeURIComponent(this.transferToken);
 		}
 		if (this.options.pfm) {
