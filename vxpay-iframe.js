@@ -627,7 +627,7 @@
 	};
 
 	ModalboxPayment.prototype._getGet = function (sVar) {
-		return decodeURI(this.window.location.search.replace(new RegExp('^(?:.*[&\\?]' + encodeURI(sVar).replace(/[\.\+\*]/g, '\\$&') + '(?:\\=([^&]*))?)?.*$', 'i'), '$1'));
+		return decodeURIComponent(this.window.location.search.replace(new RegExp('^(?:.*[&\\?]' + encodeURI(sVar).replace(/[\.\+\*]/g, '\\$&') + '(?:\\=([^&]*))?)?.*$', 'i'), '$1'));
 	};
 
 	// cross-browser event registration
@@ -1291,6 +1291,28 @@
 			pwdresetUserId:   this._getGet('u'),
 			pwdresetUserName: this._getGet('tpLoginPwdLost'),
 			pwdresetKey:      this._getGet('key')
+		};
+
+		for (var key in options) {
+			if (!options.hasOwnProperty(key)) continue;
+			data[key] = options[key];
+		}
+
+		this.sendOptions(data);
+		this._show();
+	};
+
+	/**
+	 * Open Password lost flow
+	 *
+	 * @param {object} options
+	 */
+	ModalboxPayment.prototype.openPasswordLost = function (options) {
+		var data = {
+			flow:             'pwdlost',
+			pwdresetUserId:   this._getGet('u'),
+			pwdresetUserName: this._getGet('tpLoginPwdLost'),
+			pwdresetEmail:    this._getGet('tpEmailPwdLost')
 		};
 
 		for (var key in options) {

@@ -453,6 +453,15 @@ describe('Modalbox JS API Test', function() {
 		it('getBalance() method exists?', function() {
 			expect(typeof modalbox.getBalance).toEqual('function');
 		});
+		it('test GET params', function() {
+			win.location.search = '?tpEmailPwdLost=test%40campoint.net&flow=vxpay-flow&access_token=TOK_Aasdadlkjad46464-asdasdasd161asd&show=1&u=123456';
+
+			expect(modalbox._getGet('tpEmailPwdLost')).toEqual('test@campoint.net');
+			expect(modalbox._getGet('flow')).toEqual('vxpay-flow');
+			expect(modalbox._getGet('access_token')).toEqual('TOK_Aasdadlkjad46464-asdasdasd161asd');
+			expect(modalbox._getGet('show')).toEqual('1');
+			expect(modalbox._getGet('u')).toEqual('123456');
+		});
 	});
 
 	/** Flow tests */
