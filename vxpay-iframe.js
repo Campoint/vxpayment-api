@@ -1412,7 +1412,6 @@
 	/**
 	 * Opens PromoCode
 	 *
-	 * @param {object} pc
 	 * @param {object} options
 	 */
 	ModalboxPayment.prototype.openPromoCode = function (options) {
@@ -1432,7 +1431,6 @@
 	/**
 	 * Opens ScratchCard
 	 *
-	 * @param {object} pc
 	 * @param {object} options
 	 */
 	ModalboxPayment.prototype.openScratchCard = function (options) {
