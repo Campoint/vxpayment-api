@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.4.19 */
+/** @version 1.4.20 */
 /*jshint strict:false */
 
 (function(window) {
@@ -1769,6 +1769,26 @@
 	ModalboxPayment.prototype.openPromoCode = function (options) {
 		var data = {
 			flow : 'promocode'
+		};
+
+		for (var key in options) {
+			if (!options.hasOwnProperty(key)) continue;
+			data[key] = options[key];
+		}
+
+		this.sendOptions(data);
+		this._show('promocode');
+	};
+
+	/**
+	 * Opens ScratchCard
+	 *
+	 * @param {object} pc
+	 * @param {object} options
+	 */
+	ModalboxPayment.prototype.openScratchCard = function (options) {
+		var data = {
+			flow : 'scratchcard'
 		};
 
 		for (var key in options) {
