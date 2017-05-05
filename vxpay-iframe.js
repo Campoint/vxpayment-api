@@ -1430,6 +1430,26 @@
 	};
 
 	/**
+	 * Opens ScratchCard
+	 *
+	 * @param {object} pc
+	 * @param {object} options
+	 */
+	ModalboxPayment.prototype.openScratchCard = function (options) {
+		var data = {
+			flow : 'scratchcard'
+		};
+
+		for (var key in options) {
+			if (!options.hasOwnProperty(key)) continue;
+			data[key] = options[key];
+		}
+
+		this.sendOptions(data);
+		this._show('promocode');
+	};
+
+	/**
 	 * Opens Carrier Flow
 	 *
 	 * @param {object} options
