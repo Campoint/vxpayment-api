@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.4.20 */
+/** @version 1.4.21 */
 /*jshint strict:false */
 
 (function(window) {
@@ -1763,7 +1763,6 @@
 	/**
 	 * Opens PromoCode
 	 *
-	 * @param {object} pc
 	 * @param {object} options
 	 */
 	ModalboxPayment.prototype.openPromoCode = function (options) {
@@ -1783,7 +1782,6 @@
 	/**
 	 * Opens ScratchCard
 	 *
-	 * @param {object} pc
 	 * @param {object} options
 	 */
 	ModalboxPayment.prototype.openScratchCard = function (options) {
