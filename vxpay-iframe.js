@@ -1158,6 +1158,26 @@
 	};
 
 	/**
+	 * Open Paytour in trial abo flow
+	 *
+	 * @param {object} options
+	 */
+	ModalboxPayment.prototype.openTrialAboPaytour = function (options) {
+		this.options.flow = 'trialvipabo';
+		var data = {
+			flow : this.options.flow
+		};
+
+		for (var key in options) {
+			if (!options.hasOwnProperty(key)) continue;
+			data[key] = options[key];
+		}
+
+		this.sendOptions(data);
+		this._show('abo');
+	};
+
+	/**
 	 * Open Paytour in VXTV abo flow
 	 *
 	 * @param {object} options
