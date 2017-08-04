@@ -498,7 +498,7 @@
 			}
 			// default no animation
 			else {
-				window.scrollTo(0, msgObject.data.top);
+				window.scrollTo(0, top);
 			}
 		} catch(e) {
 		}
