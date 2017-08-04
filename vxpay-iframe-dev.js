@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.4.22 */
+/** @version 1.4.23 */
 /*jshint strict:false */
 
 (function(window) {
@@ -849,7 +849,7 @@
 			}
 			// default no animation
 			else {
-				window.scrollTo(0, msgObject.data.top);
+				window.scrollTo(0, top);
 			}
 		} catch(e) {
 		}
