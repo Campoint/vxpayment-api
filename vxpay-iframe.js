@@ -174,7 +174,9 @@
 				}
 
 				// scroll parent to top - for mobiles
-				event.modalbox._scrollTo(1);
+				if (this._isMobile()) {
+					event.modalbox._scrollTo(1);
+				}
 			});
 		}
 		if (typeof this.onAfterHide !== 'function') {
