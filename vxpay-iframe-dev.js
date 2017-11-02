@@ -704,7 +704,6 @@
 	};
 
 	ModalboxPayment.prototype._showIframe = function (path) {
-		var that = this;
 		this._showOverlay();
 		this._setParentViewport();
 
@@ -712,8 +711,8 @@
 			this._initIframe();
 			this._showSpinner();
 			window.setTimeout(function() {
-				that._showIframe(path);
-			}, 1000);
+				this._showIframe(path);
+			}.bind(this), 1000);
 			return false;
 		} else if(typeof path !== 'undefined' && path !== '') {
 			this._changeRoute('/' + path);
