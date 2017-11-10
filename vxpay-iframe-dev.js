@@ -425,6 +425,7 @@
 		this.options.w = options.w || this.options.w;
 		this.options.ws = options.ws || this.options.ws;
 		this.options.wt = options.wt || this.options.wt;
+		this.options.adtv = options.adtv || this.options.adtv;
 		this.options.sub = options.sub || this.options.sub;
 		this.options.option = options.option || this.options.option;
 		this.options.pc = options.pc || this.options.pc;
