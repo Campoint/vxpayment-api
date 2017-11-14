@@ -722,7 +722,10 @@
 		}
 		this.visible = true;
 		this._initSession();
-		this.iframe.style.display = 'block';
+
+		if (this.iframe) {
+			this.iframe.style.display = 'block';
+		}
 	};
 
 	ModalboxPayment.prototype._showTab = function (path) {
