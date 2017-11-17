@@ -169,9 +169,11 @@
 		if (typeof this.onAfterShow !== 'function') {
 			this.on('afterShow', function (event) {
 				if (!this._getUseTab()) {
-					// store orig. overflow and set new
-					event.modalbox._storedValues.parentBodyOverflow = this.window.document.body.style.overflow;
-					event.modalbox.window.document.body.style.overflow = 'hidden';
+					if (typeof event.modalbox._storedValues.parentBodyOverflow === 'undefined') {
+						// store orig. overflow and set new
+						event.modalbox._storedValues.parentBodyOverflow    = this.window.document.body.style.overflow;
+						event.modalbox.window.document.body.style.overflow = 'hidden';
+					}
 				}
 
 				// scroll parent to top - for mobiles
@@ -186,6 +188,7 @@
 					// restore overflow on body
 					if (typeof event.modalbox._storedValues.parentBodyOverflow !== 'undefined') {
 						event.modalbox.window.document.body.style.overflow = event.modalbox._storedValues.parentBodyOverflow;
+						event.modalbox._storedValues.parentBodyOverflow    = undefined;
 					}
 				}
 			});
