@@ -82,6 +82,7 @@
 		this.options.environment = options.environment || this.options.environment;
 		this.options.flow = options.flow || this.options.flow;
 		this.options.showOAuth = options.showOAuth || this.options.showOAuth;
+		this.options.externalRefId = options.externalRefId || this.options.externalRefId;
 	};
 
 	ModalboxPayment.prototype._setOptionsLazy = function (options) {
@@ -93,6 +94,7 @@
 		this.optionsLazy.aurl = options.agbUrl;
 		this.optionsLazy.prurl = options.privacyUrl;
 		this.optionsLazy.purl = this.window.location.href;
+		this.optionsLazy.externalRefId = options.externalRefId || this.options.externalRefId;
 	};
 
 	ModalboxPayment.prototype._setOptionsApi = function (options) {
