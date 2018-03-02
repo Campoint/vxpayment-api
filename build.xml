@@ -110,7 +110,7 @@
         <exec executable="${grunt}"></exec>
     </target>
 
-	<target name="build" depends="jshint,deleteBuild,version-tag,compressjs,karma,dev-grunt">
+	<target name="build" depends="jshint,deleteBuild,version-tag,compressjs,dev-grunt">
 	</target>
 
 	<target name="release">
