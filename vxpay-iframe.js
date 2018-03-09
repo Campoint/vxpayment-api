@@ -83,6 +83,7 @@
 		this.options.flow = options.flow || this.options.flow;
 		this.options.showOAuth = options.showOAuth || this.options.showOAuth;
 		this.options.externalRefId = options.externalRefId || this.options.externalRefId;
+		this.options.externalToken = options.externalToken || this.options.externalToken;
 	};
 
 	ModalboxPayment.prototype._setOptionsLazy = function (options) {
