@@ -1868,6 +1868,27 @@
 	};
 
 	/**
+	 * Open moneycharge flow with voicecall
+	 *
+	 * @param {object} options
+	 */
+	ModalboxPayment.prototype.openVoicecall = function(options) {
+		this.openPaytourByPaytype('Voice', options);
+	};
+
+	/**
+	 * Open moneycharge flow with voicecall
+	 *
+	 * @param {object} options
+	 */
+	ModalboxPayment.prototype.openAnonymousVoicecall = function(options) {
+		options                 = options || {};
+		options.isGuestLoggedIn = false;
+
+		this.openPaytourByPaytype('Voice', options);
+	};
+
+	/**
 	 * Returns user's AVS status
 	 */
 	ModalboxPayment.prototype.getAVSStatus = function (resolve) {
