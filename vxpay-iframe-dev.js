@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.4.33 */
+/** @version 1.4.36 */
 /*jshint strict:false */
 
 (function(window) {
@@ -1391,21 +1391,28 @@
 	 *
 	 * @param {string} route
 	 * @param {object} options
+	 *
 	 */
-	ModalboxPayment.prototype.openPaytour = function (route, options) {
+	ModalboxPayment.prototype.openPaytour = function () {
+		var route, options;
+
+		if (arguments.length > 1) {
+			route   = arguments[0];
+			options = arguments[1];
+		} else if (typeof arguments[0] === 'object') {
+			options = arguments[0];
+		} else {
+			route = arguments[0];
+		}
+
 		var flow           = 'moneycharge';
 		var shouldSendOpts = this.options.flow !== flow || typeof options !== 'undefined';
 		this.options.flow  = flow;
 
 		if (shouldSendOpts) {
-			var data = {
+			var data = this.buildFlowOptions({
 				flow : this.options.flow
-			};
-
-			for (var key in options) {
-				if (!options.hasOwnProperty(key)) continue;
-				data[key] = options[key];
-			}
+			}, options);
 
 			this.sendOptions(data);
 			this._show(route ? route : 'payment');
@@ -1417,20 +1424,27 @@
 	/**
 	 * Opens Modalbox Paytour with preselected paytype
 	 *
-	 * @param {string} route
+	 * @param {string} paytype
 	 * @param {object} options
 	 */
-	ModalboxPayment.prototype.openPaytourByPaytype = function (paytype, options) {
-		this.options.flow = 'moneycharge'; /** TODO: Move into business logic **/
-		var data = {
-				flow    : this.options.flow,
-				paytype : paytype
-			};
+	ModalboxPayment.prototype.openPaytourByPaytype = function () {
+		var paytype, options;
 
-		for (var key in options) {
-			if (!options.hasOwnProperty(key)) continue;
-			data[key] = options[key];
+		if (arguments.length > 1) {
+			paytype = arguments[0];
+			options = arguments[1];
+		} else if (typeof arguments[0] === 'object') {
+			options = arguments[0];
+		} else {
+			paytype = arguments[0];
 		}
+
+		this.options.flow = 'moneycharge';
+		/** TODO: Move into business logic **/
+		var data          = this.buildFlowOptions({
+			flow:    this.options.flow,
+			paytype: paytype
+		}, options);
 
 		this.sendOptions(data);
 		this._show('');
@@ -1443,15 +1457,10 @@
 	 */
 	ModalboxPayment.prototype.openLimitPaytour = function (options) {
 		this.options.flow = 'limit';
-		var data = {
-			flow    : this.options.flow,
-			paytype : ''
-		};
-
-		for (var key in options) {
-			if (!options.hasOwnProperty(key)) continue;
-			data[key] = options[key];
-		}
+		var data          = this.buildFlowOptions({
+			flow:    this.options.flow,
+			paytype: ''
+		}, options);
 
 		this.sendOptions(data);
 		this._show('');
@@ -1464,15 +1473,10 @@
 	 */
 	ModalboxPayment.prototype.openOneClickPaytour = function (options) {
 		this.options.flow = 'oneclick';
-		var data = {
-			flow    : this.options.flow,
-			paytype : ''
-		};
-
-		for (var key in options) {
-			if (!options.hasOwnProperty(key)) continue;
-			data[key] = options[key];
-		}
+		var data          = this.buildFlowOptions({
+			flow:    this.options.flow,
+			paytype: ''
+		}, options);
 
 		this.sendOptions(data);
 		this._show('');
@@ -1487,14 +1491,9 @@
 		this.options.flow = 'autorecharge';
 		this._setUseTab(false);
 
-		var data = {
-			flow    : this.options.flow
-		};
-
-		for (var key in options) {
-			if (!options.hasOwnProperty(key)) continue;
-			data[key] = options[key];
-		}
+		var data = this.buildFlowOptions({
+			flow: this.options.flow
+		}, options);
 
 		this.sendOptions(data);
 		this._show('', false);
@@ -1507,14 +1506,9 @@
 	 */
 	ModalboxPayment.prototype.openAboPaytour = function (options) {
 		this.options.flow = 'vipabo';
-		var data = {
-			flow : this.options.flow
-		};
-
-		for (var key in options) {
-			if (!options.hasOwnProperty(key)) continue;
-			data[key] = options[key];
-		}
+		var data          = this.buildFlowOptions({
+			flow: this.options.flow
+		}, options);
 
 		this.sendOptions(data);
 		this._show('abo');
@@ -1527,14 +1521,9 @@
 	 */
 	ModalboxPayment.prototype.openTrialAboPaytour = function (options) {
 		this.options.flow = 'trialvipabo';
-		var data = {
-			flow : this.options.flow
-		};
-
-		for (var key in options) {
-			if (!options.hasOwnProperty(key)) continue;
-			data[key] = options[key];
-		}
+		var data          = this.buildFlowOptions({
+			flow: this.options.flow
+		}, options);
 
 		this.sendOptions(data);
 		this._show('abo');
@@ -1547,14 +1536,9 @@
 	 */
 	ModalboxPayment.prototype.openVXTVAbo = function (options) {
 		this.options.flow = 'vxtvabo';
-		var data = {
-			flow : this.options.flow
-		};
-
-		for (var key in options) {
-			if (!options.hasOwnProperty(key)) continue;
-			data[key] = options[key];
-		}
+		var data          = this.buildFlowOptions({
+			flow: this.options.flow
+		}, options);
 
 		this.sendOptions(data);
 		this._show('abo');
@@ -1585,15 +1569,10 @@
 	 */
 	ModalboxPayment.prototype.openChangeCreditcard = function (options) {
 		this.options.flow = 'changecc';
-		var data = {
-			flow    : this.options.flow,
-			paytype : 'CC'
-		};
-
-		for (var key in options) {
-			if (!options.hasOwnProperty(key)) continue;
-			data[key] = options[key];
-		}
+		var data          = this.buildFlowOptions({
+			flow:    this.options.flow,
+			paytype: 'CC'
+		}, options);
 
 		this.sendOptions(data);
 		this._show();
@@ -1607,15 +1586,10 @@
 	 */
 	ModalboxPayment.prototype.openChangeLastschrift = function (options) {
 		this.options.flow = 'changels';
-		var data = {
-			flow    : this.options.flow,
-			paytype : 'LS'
-		};
-
-		for (var key in options) {
-			if (!options.hasOwnProperty(key)) continue;
-			data[key] = options[key];
-		}
+		var data          = this.buildFlowOptions({
+			flow:    this.options.flow,
+			paytype: 'LS'
+		}, options);
 
 		this.sendOptions(data);
 		this._show();
@@ -1628,15 +1602,10 @@
 	 */
 	ModalboxPayment.prototype.openSettings = function (options) {
 		this.options.flow = 'settings';
-		var data = {
-			flow    : this.options.flow,
-			paytype : ''
-		};
-
-		for (var key in options) {
-			if (!options.hasOwnProperty(key)) continue;
-			data[key] = options[key];
-		}
+		var data          = this.buildFlowOptions({
+			flow:    this.options.flow,
+			paytype: ''
+		}, options);
 
 		this.sendOptions(data);
 		this._show();
@@ -1649,15 +1618,10 @@
 	 */
 	ModalboxPayment.prototype.openVXSettings = function (options) {
 		this.options.flow = 'vxsettings';
-		var data = {
-			flow    : this.options.flow,
-			paytype : ''
-		};
-
-		for (var key in options) {
-			if (!options.hasOwnProperty(key)) continue;
-			data[key] = options[key];
-		}
+		var data          = this.buildFlowOptions({
+			flow:    this.options.flow,
+			paytype: ''
+		}, options);
 
 		this.sendOptions(data);
 		this._show();
@@ -1669,17 +1633,12 @@
 	 * @param {object} options
 	 */
 	ModalboxPayment.prototype.openPasswordReset = function (options) {
-		var data = {
+		var data = this.buildFlowOptions({
 			flow:             'pwdreset',
 			pwdresetUserId:   this._getGet('u'),
 			pwdresetUserName: this._getGet('tpLoginPwdLost'),
 			pwdresetKey:      this._getGet('key')
-		};
-
-		for (var key in options) {
-			if (!options.hasOwnProperty(key)) continue;
-			data[key] = options[key];
-		}
+		}, options);
 
 		this.sendOptions(data);
 		this._show();
@@ -1691,17 +1650,12 @@
 	 * @param {object} options
 	 */
 	ModalboxPayment.prototype.openPasswordLost = function (options) {
-		var data = {
+		var data = this.buildFlowOptions({
 			flow:             'pwdlost',
 			pwdresetUserId:   this._getGet('u'),
 			pwdresetUserName: this._getGet('tpLoginPwdLost'),
 			pwdresetEmail:    this._getGet('tpEmailPwdLost')
-		};
-
-		for (var key in options) {
-			if (!options.hasOwnProperty(key)) continue;
-			data[key] = options[key];
-		}
+		}, options);
 
 		this.sendOptions(data);
 		this._show();
@@ -1713,14 +1667,9 @@
 	 * @param {object} options
 	 */
 	ModalboxPayment.prototype.openLogin = function (options) {
-		var data = {
-			flow : 'login'
-		};
-
-		for (var key in options) {
-			if (!options.hasOwnProperty(key)) continue;
-			data[key] = options[key];
-		}
+		var data = this.buildFlowOptions({
+			flow: 'login'
+		}, options);
 
 		this.sendOptions(data);
 		this._show('login');
@@ -1732,14 +1681,9 @@
 	 * @param {object} options
 	 */
 	ModalboxPayment.prototype.openSignup = function (options) {
-		var data = {
-			flow : 'login'
-		};
-
-		for (var key in options) {
-			if (!options.hasOwnProperty(key)) continue;
-			data[key] = options[key];
-		}
+		var data = this.buildFlowOptions({
+			flow: 'login'
+		}, options);
 
 		this.sendOptions(data);
 		this._show('signup');
@@ -1779,14 +1723,9 @@
 	 */
 	ModalboxPayment.prototype.openAVS = function (options) {
 		this.options.flow = 'avs';
-		var data = {
-			flow : this.options.flow
-		};
-
-		for (var key in options) {
-			if (!options.hasOwnProperty(key)) continue;
-			data[key] = options[key];
-		}
+		var data          = this.buildFlowOptions({
+			flow: this.options.flow
+		}, options);
 
 		this.sendOptions(data);
 		this._show('avs');
@@ -1798,14 +1737,9 @@
 	 * @param {object} options
 	 */
 	ModalboxPayment.prototype.openPromoCode = function (options) {
-		var data = {
-			flow : 'promocode'
-		};
-
-		for (var key in options) {
-			if (!options.hasOwnProperty(key)) continue;
-			data[key] = options[key];
-		}
+		var data = this.buildFlowOptions({
+			flow: 'promocode'
+		}, options);
 
 		this.sendOptions(data);
 		this._show('promocode');
@@ -1817,14 +1751,9 @@
 	 * @param {object} options
 	 */
 	ModalboxPayment.prototype.openScratchCard = function (options) {
-		var data = {
+		var data = this.buildFlowOptions({
 			flow : 'scratchcard'
-		};
-
-		for (var key in options) {
-			if (!options.hasOwnProperty(key)) continue;
-			data[key] = options[key];
-		}
+		}, options);
 
 		this.sendOptions(data);
 		this._show('promocode');
@@ -1836,14 +1765,9 @@
 	 * @param {object} options
 	 */
 	ModalboxPayment.prototype.openCarrier = function (options) {
-		var data = {
-			flow : 'carrier'
-		};
-
-		for (var key in options) {
-			if (!options.hasOwnProperty(key)) continue;
-			data[key] = options[key];
-		}
+		var data = this.buildFlowOptions({
+			flow: 'carrier'
+		}, options);
 
 		this.sendOptions(data);
 		this._show('carrier');
@@ -1855,14 +1779,9 @@
 	 * @param {object} options
 	 */
 	ModalboxPayment.prototype.openOPCompensation = function (options) {
-		var data = {
-			flow : 'opcompensation'
-		};
-
-		for (var key in options) {
-			if (!options.hasOwnProperty(key)) continue;
-			data[key] = options[key];
-		}
+		var data = this.buildFlowOptions({
+			flow: 'opcompensation'
+		}, options);
 
 		this.sendOptions(data);
 		this._show('opcompensation');
@@ -1899,6 +1818,36 @@
 	};
 
 	/**
+	 * Merge initial, callback und default flow options
+	 *
+	 * @param {object} initOptions
+	 * @param {object} callOptions
+	 * @returns {*|{}}
+	 */
+	ModalboxPayment.prototype.buildFlowOptions = function (initOptions, callOptions) {
+		var data    = this.defaultFlowOptions || {};
+		initOptions = initOptions || {};
+		callOptions = callOptions || {};
+
+		var key;
+		for (key in initOptions) {
+			if (!initOptions.hasOwnProperty(key)) {
+				continue;
+			}
+			data[key] = initOptions[key];
+		}
+
+		for (key in callOptions) {
+			if (!callOptions.hasOwnProperty(key)) {
+				continue;
+			}
+			data[key] = callOptions[key];
+		}
+
+		return data;
+	};
+
+	/**
 	 * initialize paytour with default options
 	 */
 	ModalboxPayment.prototype.initPaytour = function() {
@@ -1915,6 +1864,15 @@
 	 */
 	ModalboxPayment.prototype.showPaytour = function (route) {
 		this._show(route);
+	};
+
+	/**
+	 * Set initial flow options
+	 *
+	 * @param {object} options
+	 */
+	ModalboxPayment.prototype.setDefaultFlowOptions = function (options) {
+		this.defaultFlowOptions = options;
 	};
 
 	/**

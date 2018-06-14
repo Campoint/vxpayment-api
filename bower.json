@@ -1,6 +1,6 @@
 {
 	"name": "vxpayment-api",
-	"version": "1.4.33",
+	"version": "1.4.36",
 	"main": "./vxpay-iframe.min.js",
 	"dependencies": {
 	},
