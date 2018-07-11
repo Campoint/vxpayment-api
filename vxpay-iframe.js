@@ -162,6 +162,9 @@
 			if (typeof events.onAfterHide === 'function') {
 				this.on('afterHide', events.onAfterHide);
 			}
+			if (typeof events.onLogout === 'function') {
+				this.on('logout', events.onLogout);
+			}
 		}
 
 		// set defaults
@@ -282,6 +285,9 @@
 		}
 		else if (msgObject.type === 'modalbox-hook') {
 			modalbox._trigger(msgObject.data.hook, msgObject.data);
+		}
+		else if (msgObject.type === 'modalbox-logout') {
+			modalbox._trigger('logout', msgObject.data);
 		}
 		// catch transfer_token
 		else if ((res = msgObject.type.match(/^redirect:(.*)/))) {
