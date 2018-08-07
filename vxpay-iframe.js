@@ -30,7 +30,6 @@
 		this.ready = false;
 		this.loaded = false;
 		this.visible = false;
-		this.window.ModalboxPayment = this;
 		this.tabTarget = '_blank';
 		this.overlayShow = true;
 
@@ -207,7 +206,7 @@
 	 */
 	ModalboxPayment.prototype._messageHandler = function (evt) {
 		var res = null;
-		var modalbox = window.ModalboxPayment;
+		var modalbox = this;
 
 		// serialized data?
 		var msgObject = modalbox._parseMessage(evt.data);
