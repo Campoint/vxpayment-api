@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.4.38 */
+/** @version 1.4.39 */
 /*jshint strict:false */
 
 (function(window) {
