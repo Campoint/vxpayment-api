@@ -20,6 +20,7 @@
 		this.setConfig(config);
 		this.setEvents(events);
 
+		this.window.modalboxPaymentInstance = this;
 		this.iframeId = 'modalboxiframe';
 		this.overlayId = this.iframeId + 'Overlay';
 		this.spinnerId = this.iframeId + 'Spinner';
