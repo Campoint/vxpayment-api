@@ -70,6 +70,7 @@
 		this.options = this.options || {};
 
 		this.options.pfm = options.pfm || this.options.pfm;
+		this.options.pfmsub = options.pfmsub || this.options.pfmsub;
 		this.options.s = options.host || this.options.s;
 		this.options.w = options.w || this.options.w;
 		this.options.ws = options.ws || this.options.ws;
