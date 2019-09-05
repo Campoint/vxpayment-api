@@ -481,6 +481,7 @@
 		// allow transparent iframe for <= IE8
 		ifrm.allowTransparency = 'true';
 		ifrm.allow = 'microphone; camera';
+		ifrm.setAttribute('allowFullScreen', '');
 
 		if (this._supportsStyleAttr(ifrm, 'maxHeight', '100vh')) {
 			ifrm.style.maxHeight = '100vh';
