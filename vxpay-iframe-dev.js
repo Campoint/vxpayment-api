@@ -1351,6 +1351,19 @@
 				this.iframe.src = this.iframe.src; // hack to reload iframe
 				this.contentWindow = this.iframe.contentWindow;
 			}
+
+			var that     = this;
+			var closeInt = setInterval(function() {
+				try {
+					if (that.tab && !that.tab.closed) {
+						that.tab.close();
+					} else if (!that.tab || that.tab.closed) {
+						clearInterval(closeInt);
+					}
+				} catch (e) {
+					clearInterval(closeInt);
+				}
+			}, 2000);
 		}
 	};
 
