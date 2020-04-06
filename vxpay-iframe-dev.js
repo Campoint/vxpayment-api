@@ -1524,6 +1524,21 @@
 	};
 
 	/**
+	 * Open Paytour in VXAbo flow
+	 *
+	 * @param {object} options
+	 */
+	ModalboxPayment.prototype.openVXAboPaytour = function (options) {
+		this.options.flow = 'vxabo';
+		var data          = this.buildFlowOptions({
+			flow: this.options.flow
+		}, options);
+
+		this.sendOptions(data);
+		this._show('vxabo');
+	};
+
+	/**
 	 * Open Paytour in trial abo flow
 	 *
 	 * @param {object} options
