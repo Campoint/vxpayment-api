@@ -1587,6 +1587,21 @@
 	};
 
 	/**
+	 * Open Paytour in Trial MoneyCharge flow
+	 *
+	 * @param {object} options
+	 */
+	ModalboxPayment.prototype.openTrialPaytour = function (options) {
+		this.options.flow = 'trialmoneycharge';
+		var data          = this.buildFlowOptions({
+			flow:    this.options.flow
+		}, options);
+
+		this.sendOptions(data);
+		this._show();
+	};
+
+	/**
 	 * Open Paytour in Creditcard change flow
 	 *
 	 * @param {object} options
