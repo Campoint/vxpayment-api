@@ -4,3 +4,5 @@ deleteBuild
 dev
 gettext
 init
+npm-pack
+release

@@ -6,13 +6,14 @@
 	<property name="php" value="/home/php/bin/php"/>
 	<property name="bin" value="${basedir}/bin"/>
 	<property name="vendor_bin" value="${basedir}/vendor/bin"/>
+	<property name="build_dir" value="${basedir}/dist"/>
 	<property name="src_dir" value="${basedir}/src/"/>
 	<property name="http_root" value="${basedir}/http-root/"/>
 	<property name="tests_dir" value="${basedir}/tests"/>
 	<property name="bdd_dir" value="${basedir}/features"/>
 	<property name="server_port" value="9123"/>
 	<property name="server_host" value="localhost"/>
-	<property name="npm" value="/usr/bin/npm"/>
+	<property name="npm" value="/opt/node12/bin/npm"/>
 	<property name="jshint" value="${basedir}/node_modules/.bin/jshint"/>
 	<property name="karma" value="${basedir}/node_modules/karma/bin/karma"/>
 	<property name="dalek" value="${basedir}/node_modules/.bin/dalek"/>
@@ -110,10 +111,17 @@
         <exec executable="${grunt}"></exec>
     </target>
 
+    <target name="npm-pack" description="pack as a tarball">
+	<exec executable="${npm}" dir="${build_dir}">
+	    <arg value="pack"/>
+	    <arg path="${basedir}"/>
+	</exec>
+    </target>
+
 	<target name="build" depends="jshint,deleteBuild,version-tag,compressjs,dev-grunt">
 	</target>
 
-	<target name="release">
+	<target name="release" description="release a new build version">
 		<exec executable="git" resolveexecutable="true" failonerror="true">
 			<arg value="pull"/>
 		</exec>
@@ -142,6 +150,12 @@
 			/>
 
 		<antcall target="build" />
+		<antcall target="npm-pack" />
+
+		<exec executable="${npm}" dir="${build_dir}">
+			<arg value="pack"/>
+		</exec>
+
 		<exec executable="git" resolveexecutable="true" failonerror="true">
 			<arg value="commit"/>
 			<arg value="-am"/>
