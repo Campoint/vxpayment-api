@@ -135,6 +135,12 @@
 		               byline="true"
 			/>
 
+		<replaceregexp file="${basedir}/package.json"
+		               match='(version": "[0-9\.\-a-z]+)"'
+		               replace='version": "${libver}"'
+		               byline="true"
+			/>
+
 		<antcall target="build" />
 		<exec executable="git" resolveexecutable="true" failonerror="true">
 			<arg value="commit"/>
