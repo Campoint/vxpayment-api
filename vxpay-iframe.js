@@ -1513,7 +1513,7 @@
 	 * @returns {*|{}}
 	 */
 	ModalboxPayment.prototype.buildFlowOptions = function (initOptions, callOptions) {
-		var data    = this.defaultFlowOptions || {};
+		var data    = Object.assign({}, this.defaultFlowOptions || {});
 		initOptions = initOptions || {};
 		callOptions = callOptions || {};
 
