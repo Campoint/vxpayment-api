@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.4.49 */
+/** @version 1.4.50 */
 /*jshint strict:false */
 
 (function(window) {
@@ -1864,7 +1864,7 @@
 	 * @returns {*|{}}
 	 */
 	ModalboxPayment.prototype.buildFlowOptions = function (initOptions, callOptions) {
-		var data    = this.defaultFlowOptions || {};
+		var data    = Object.assign({}, this.defaultFlowOptions || {});
 		initOptions = initOptions || {};
 		callOptions = callOptions || {};
 
