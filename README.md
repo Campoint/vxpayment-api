@@ -27,3 +27,4 @@ Afterwards, just push all the changes, as shown in the last hint from the `relea
 `git push; git push --tags`
 
 The new version can then be deployed in other depending projects or `vxpayment-v3` - see README there.
+
