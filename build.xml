@@ -97,7 +97,7 @@
 	<target name="version-tag">
 		<exec executable="node" resolveexecutable="true" outputproperty="apiVersionNew">
 			<arg value="-e"/>
-			<arg value="console.log(require('${basedir}/bower.json').version);"/>
+			<arg value="console.log(require('${basedir}/package.json').version);"/>
 		</exec>
 
 		<replaceregexp file="${basedir}/vxpay-iframe.js"
@@ -127,7 +127,7 @@
 		</exec>
 		<exec executable="node" resolveexecutable="true" outputproperty="apiVersion">
 			<arg value="-e"/>
-			<arg value="console.log(require('${basedir}/bower.json').version);"/>
+			<arg value="console.log(require('${basedir}/package.json').version);"/>
 		</exec>
 
 		<echo message="Current version: ${apiVersion}" />
@@ -135,12 +135,6 @@
 		<input
 			message="Please enter the new version:"
 			addproperty="libver"
-			/>
-
-		<replaceregexp file="${basedir}/bower.json"
-		               match='(version": "[0-9\.\-a-z]+)"'
-		               replace='version": "${libver}"'
-		               byline="true"
 			/>
 
 		<replaceregexp file="${basedir}/package.json"
