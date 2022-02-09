@@ -1,7 +1,7 @@
 {
   "name": "VXPaymentApi",
   "private": true,
-  "version": "1.4.51",
+  "version": "1.4.52",
   "dependencies": {},
   "devDependencies": {
     "grunt-cli": "~0.1.13",
