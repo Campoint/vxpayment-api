@@ -146,10 +146,6 @@
 		<antcall target="build" />
 		<antcall target="npm-pack" />
 
-		<exec executable="${npm}" dir="${build_dir}">
-			<arg value="pack"/>
-		</exec>
-
 		<exec executable="git" resolveexecutable="true" failonerror="true">
 			<arg value="commit"/>
 			<arg value="-am"/>
