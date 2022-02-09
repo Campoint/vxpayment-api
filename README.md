@@ -2,19 +2,28 @@
 
 ## Prepare Dev Environment
 
+This task initializes the project, loading all dependencies etc.
+
+`ant dev`
+
 ## Building new version
 
-### Release new API version - run build task
-- runs syntax and code checks
+As soon, as you've completed all the changes, it's time to release a new version.
+
+### Release new API version - run release task
+- it runs syntax and code checks
 - runs unit tests and frontend tests (karma)
 - minifies javascript
 - updates current API version from the current git version tag 
 
-1) tag the new version (after merging feature to master e.g.)
+Jus type:
 
-git tag X.Y.Z
+`ant release`
 
-2) run build process
+Then you'll be shown the current version and can enter a new version tag.
 
-ant build
+Afterwards, just push all the changes, as shown in the last hint from the `release` task.
 
+`git push; git push --tags`
+
+The new version can then be deployed in other depending projects or `vxpayment-v3` - see README there.
