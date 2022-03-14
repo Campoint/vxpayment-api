@@ -1,7 +1,7 @@
 {
   "name": "VXPaymentApi",
   "private": true,
-  "version": "1.4.54",
+  "version": "1.4.55",
   "dependencies": {},
   "devDependencies": {
     "grunt": "^1.4.1",

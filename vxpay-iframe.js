@@ -9,10 +9,10 @@
 	 * @author ph
 	 */
 	var ModalboxPayment = function (urls, window, options, config, events) {
-		this.window = window;
-		this.transferToken = '';
+		this.window            = window;
+		this.transferToken     = '';
 		// token to initialize session - either from parameter, URL or as access token
-		this.redirectToken = options.tt || this._getGet('redirect_token') || options.at;
+		this.redirectToken     = options.tt || this._getGet('redirect_token') || options.at;
 		this.defaultSuccessUrl = 'http://www.visit-x.net/';
 
 		this.setUrls(urls);
@@ -21,20 +21,20 @@
 		this.setEvents(events);
 
 		this.window.modalboxPaymentInstance = this;
-		this.iframeId = 'modalboxiframe';
-		this.overlayId = this.iframeId + 'Overlay';
-		this.spinnerId = this.iframeId + 'Spinner';
+		this.iframeId                       = 'modalboxiframe';
+		this.overlayId                      = this.iframeId + 'Overlay';
+		this.spinnerId                      = this.iframeId + 'Spinner';
 
 		// save viewport scale on start
-		this.view = '';
+		this.view        = '';
 		this.iframeReady = false;
-		this.ready = false;
-		this.loaded = false;
-		this.visible = false;
-		this.tabTarget = '_blank';
+		this.ready       = false;
+		this.loaded      = false;
+		this.visible     = false;
+		this.tabTarget   = '_blank';
 		this.overlayShow = true;
 
-		this.useTab = false;
+		this.useTab        = false;
 		this.useTabDefault = false;
 
 		// explicitly trigger new tab feature?
@@ -53,8 +53,8 @@
 		}
 
 		this._responseHandlers = {};
-		this._storedValues = {};
-		this._hooks = {};
+		this._storedValues     = {};
+		this._hooks            = {};
 		this._registerListener();
 	};
 
