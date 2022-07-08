@@ -1,4 +1,4 @@
 {
   "project_id" : "VXPaymentApi",
-  "conduit_uri" : "https://phabricator.x/"
+  "conduit_uri" : "https://phabricator.sel1.ops.xxx/"
 }
