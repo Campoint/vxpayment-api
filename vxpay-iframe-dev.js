@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.4.57 */
+/** @version 1.4.58 */
 /*jshint strict:false */
 
 (function(window) {
@@ -520,6 +520,9 @@
 			if (typeof events.onCountdownfinished === 'function') {
 				this.on('countdownfinished', events.onCountdownFinished);
 			}
+			if (typeof events.onSignup === 'function') {
+				this.on('signup', events.onSignup);
+			}
 		}
 
 		// set defaults
@@ -666,6 +669,9 @@
 		}
 		else if (msgObject.type === 'modalbox-countdownfinished') {
 			modalbox._trigger('countdownfinished');
+		}
+		else if (msgObject.type === 'modalbox-signup') {
+			modalbox._trigger('signup');
 		}
 	};
 
