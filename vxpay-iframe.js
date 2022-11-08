@@ -1,4 +1,4 @@
-/** @version 1.4.58 */
+/** @version 1.4.59 */
 /*jshint strict:false */
 
 (function(window) {
@@ -1534,14 +1534,22 @@
 			if (!initOptions.hasOwnProperty(key)) {
 				continue;
 			}
-			data[key] = initOptions[key];
+			if (typeof initOptions[key] === 'object') {
+				data[key] = Object.assign(data[key] || {}, initOptions[key] || {});
+			} else {
+				data[key] = initOptions[key];
+			}
 		}
 
 		for (key in callOptions) {
 			if (!callOptions.hasOwnProperty(key)) {
 				continue;
 			}
-			data[key] = callOptions[key];
+			if (typeof callOptions[key] === 'object') {
+				data[key] = Object.assign(data[key] || {}, callOptions[key] || {});
+			} else {
+				data[key] = callOptions[key];
+			}
 		}
 
 		return data;
