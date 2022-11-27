@@ -1534,7 +1534,7 @@
 			if (!initOptions.hasOwnProperty(key)) {
 				continue;
 			}
-			if (typeof initOptions[key] === 'object') {
+			if (typeof initOptions[key] === 'object' && !Array.isArray(initOptions[key])) {
 				data[key] = Object.assign(data[key] || {}, initOptions[key] || {});
 			} else {
 				data[key] = initOptions[key];
@@ -1545,7 +1545,7 @@
 			if (!callOptions.hasOwnProperty(key)) {
 				continue;
 			}
-			if (typeof callOptions[key] === 'object') {
+			if (typeof callOptions[key] === 'object' && !Array.isArray(initOptions[key])) {
 				data[key] = Object.assign(data[key] || {}, callOptions[key] || {});
 			} else {
 				data[key] = callOptions[key];
