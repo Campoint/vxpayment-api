@@ -1545,7 +1545,7 @@
 			if (!callOptions.hasOwnProperty(key)) {
 				continue;
 			}
-			if (typeof callOptions[key] === 'object' && !Array.isArray(initOptions[key])) {
+			if (typeof callOptions[key] === 'object' && !Array.isArray(callOptions[key])) {
 				data[key] = Object.assign(data[key] || {}, callOptions[key] || {});
 			} else {
 				data[key] = callOptions[key];
