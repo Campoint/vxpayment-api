@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.5.50 */
+/** @version 1.5.51 */
 /*jshint strict:false */
 
 (function(window) {
@@ -1896,7 +1896,7 @@
 			if (!callOptions.hasOwnProperty(key)) {
 				continue;
 			}
-			if (typeof callOptions[key] === 'object' && !Array.isArray(initOptions[key])) {
+			if (typeof callOptions[key] === 'object' && !Array.isArray(callOptions[key])) {
 				data[key] = Object.assign(data[key] || {}, callOptions[key] || {});
 			} else {
 				data[key] = callOptions[key];
