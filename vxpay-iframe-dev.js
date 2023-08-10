@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.5.51 */
+/** @version 1.5.52 */
 /*jshint strict:false */
 
 (function(window) {
@@ -426,6 +426,7 @@
 		this.options.w = options.w || this.options.w;
 		this.options.ws = options.ws || this.options.ws;
 		this.options.wt = options.wt || this.options.wt;
+		this.options.gk_cid = options.gk_cid || this.options.gk_cid;
 		this.options.adtv = options.adtv || this.options.adtv;
 		this.options.sub = options.sub || this.options.sub;
 		this.options.option = options.option || this.options.option;
