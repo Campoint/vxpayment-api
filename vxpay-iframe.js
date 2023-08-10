@@ -75,6 +75,7 @@
 		this.options.w = options.w || this.options.w;
 		this.options.ws = options.ws || this.options.ws;
 		this.options.wt = options.wt || this.options.wt;
+		this.options.gk_cid = options.gk_cid || this.options.gk_cid;
 		this.options.adtv = options.adtv || this.options.adtv;
 		this.options.sub = options.sub || this.options.sub;
 		this.options.option = options.option || this.options.option;
