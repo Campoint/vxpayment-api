@@ -1,4 +1,4 @@
-/** @version 1.5.52 */
+/** @version 1.5.53 */
 /*jshint strict:false */
 
 (function(window) {
@@ -510,6 +510,8 @@
 		} else {
 			ifrm.style.position = 'fixed';
 		}
+
+		this._trigger('createIframe', ifrm);
 
 		return ifrm;
 	};
