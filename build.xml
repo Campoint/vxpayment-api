@@ -13,9 +13,8 @@
 	<property name="bdd_dir" value="${basedir}/features"/>
 	<property name="server_port" value="9123"/>
 	<property name="server_host" value="localhost"/>
-	<property name="npm" value="/opt/node12/bin/npm"/>
+	<property name="npm" value="/opt/node18/bin/npm"/>
 	<property name="jshint" value="${basedir}/node_modules/.bin/jshint"/>
-	<property name="karma" value="${basedir}/node_modules/karma/bin/karma"/>
 	<property name="dalek" value="${basedir}/node_modules/.bin/dalek"/>
 	<property name="uglifyjs" value="${basedir}/node_modules/.bin/uglifyjs"/>
     <property name="grunt" value="${basedir}/node_modules/.bin/grunt"/>
@@ -84,13 +83,6 @@
 		<exec executable="${jshint}">
 			<arg value="--exclude-path=${basedir}/.jshintignore"/>
 			<arg path="${basedir}/vxpay-iframe.js"/>
-		</exec>
-	</target>
-
-	<target name="karma">
-		<exec executable="${karma}">
-			<arg value="start"/>
-			<arg path="${tests_dir}/karma.conf.js"/>
 		</exec>
 	</target>
 
@@ -169,9 +161,6 @@
 	</target>
 
 	<target name="init" description="Installs all packages for development" depends="dev">
-	</target>
-
-	<target name="test" depends="karma">
 	</target>
 
 </project>

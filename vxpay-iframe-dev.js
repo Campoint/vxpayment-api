@@ -442,9 +442,9 @@
 	ModalboxPayment.prototype._setOptionsLazy = function (options) {
 		this.optionsLazy = this.optionsLazy || {};
 
-		this.optionsLazy.ref = options.ref || this.window.document.referrer;
-		this.optionsLazy.ruri = options.ruri || this.window.location.href;
-		this.optionsLazy.surl = options.surl || this.window.location.href;
+		this.optionsLazy.ref = options.ref !== undefined ? options.ref : this.window.document.referrer;
+		this.optionsLazy.ruri = options.ruri !== undefined ? options.ruri : this.window.location.href;
+		this.optionsLazy.surl = options.surl !== undefined ? options.surl : this.window.location.href;
 		this.optionsLazy.aurl = options.agbUrl;
 		this.optionsLazy.prurl = options.privacyUrl;
 		this.optionsLazy.purl = this.window.location.href;
