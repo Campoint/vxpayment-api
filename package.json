@@ -1,7 +1,7 @@
 {
   "name": "VXPaymentApi",
   "private": true,
-  "version": "1.5.55",
+  "version": "1.5.56",
   "main": "vxpay-iframe.js",
   "module": "vxpay-iframe.esm.js",
   "exports": {
