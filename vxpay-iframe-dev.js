@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.5.54 */
+/** @version 1.5.55 */
 /*jshint strict:false */
 
 (function(window) {
@@ -846,7 +846,8 @@
 		ifrm.allowTransparency = 'true';
 		ifrm.allow = 'microphone; camera';
 		ifrm.setAttribute('allowFullScreen', '');
-
+		ifrm.setAttribute('allow', 'payment');
+		
 		if (this._supportsStyleAttr(ifrm, 'maxHeight', '100vh')) {
 			ifrm.style.maxHeight = '100vh';
 		} else {
