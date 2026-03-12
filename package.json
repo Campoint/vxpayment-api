@@ -2,6 +2,14 @@
   "name": "VXPaymentApi",
   "private": true,
   "version": "1.5.55",
+  "main": "vxpay-iframe.js",
+  "module": "vxpay-iframe.esm.js",
+  "exports": {
+    ".": {
+      "import": "./vxpay-iframe.esm.js",
+      "require": "./vxpay-iframe.js"
+    }
+  },
   "devDependencies": {
     "grunt": "^1.4.1",
     "grunt-cli": "^0.1.13",

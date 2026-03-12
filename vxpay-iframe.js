@@ -1656,4 +1656,5 @@
 		window.ModalboxPayment            = ModalboxPayment;
 		window.ModalboxPaymentConstructor = ModalboxPayment;
 	}
+	return ModalboxPayment;
 })(window);
