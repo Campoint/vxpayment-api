@@ -1,0 +1,89 @@
+# https://taskfile.dev
+# Build runner for VXPaymentApi (migrated from the legacy Ant build.xml).
+version: '3'
+
+vars:
+  BIN: '{{.ROOT_DIR}}/node_modules/.bin'
+
+tasks:
+  default:
+    desc: List available tasks
+    cmds:
+      - task --list
+    silent: true
+
+  install:
+    desc: Install npm dependencies
+    cmds:
+      - npm install
+
+  dev:
+    desc: Prepare dev environment (install deps + http-root symlinks for local serving)
+    deps: [install]
+    cmds:
+      - mkdir -p http-root
+      - ln -sf ../vxpay-iframe.js http-root/vxpay-iframe.js
+      - ln -sf ../vxpay-iframe.min.js http-root/vxpay-iframe.min.js
+      - ln -sf ../spin.min.js http-root/spin.min.js
+
+  lint:
+    desc: Run JSHint on the API source
+    cmds:
+      - '{{.BIN}}/jshint vxpay-iframe.js'
+
+  version-sync:
+    desc: Sync the @version comment in the source from package.json
+    vars:
+      VER:
+        sh: node -p "require('./package.json').version"
+    cmds:
+      - sed -i 's#@version [0-9A-Za-z.-]\+#@version {{.VER}}#' vxpay-iframe.js
+
+  compress:
+    desc: Minify the API source (vxpay-iframe.js -> vxpay-iframe-api.min.js)
+    cmds:
+      - '{{.BIN}}/uglifyjs vxpay-iframe.js --comments /version/ -o vxpay-iframe-api.min.js'
+
+  concat:
+    desc: Build the concatenated dev + min bundles (grunt)
+    cmds:
+      - '{{.BIN}}/grunt concat'
+
+  esm:
+    desc: Generate the ESM bundle (vxpay-iframe.esm.js)
+    cmds:
+      - '{{.BIN}}/grunt esm'
+
+  clean:
+    desc: Remove generated build artifacts
+    cmds:
+      - rm -f vxpay-iframe-api.min.js vxpay-iframe.min.js vxpay-iframe-dev.js vxpay-iframe.esm.js
+      - rm -rf dist http-root
+
+  build:
+    desc: Full build - lint, sync version, minify, bundle (dev / min / esm)
+    cmds:
+      - task: lint
+      - rm -f vxpay-iframe-api.min.js vxpay-iframe.min.js vxpay-iframe-dev.js
+      - task: version-sync
+      - task: compress
+      - task: concat
+      - task: esm
+
+  release:
+    desc: 'Release a new version. Usage: task release VERSION=1.5.57'
+    requires:
+      vars: [VERSION]
+    cmds:
+      - git pull
+      - npm version {{.VERSION}} --no-git-tag-version --allow-same-version
+      - task: build
+      - git commit -am "Api build {{.VERSION}}"
+      - git tag {{.VERSION}}
+      - 'echo "Tagged {{.VERSION}}. Now run: task push"'
+
+  push:
+    desc: Push commits and tags to origin
+    cmds:
+      - git push
+      - git push --tags
