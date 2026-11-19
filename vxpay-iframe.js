@@ -972,15 +972,6 @@
 	};
 
 	/**
-	 * Init the session with a given token
-	 * @param token
-	 */
-	ModalboxPayment.prototype.loadSessionWithExternalToken = function (token) {
-		this.redirectToken = token;
-		this._initSession(token);
-	};
-
-	/**
 	 * Hides Iframe and overlay on the page, restores viewport
 	 */
 	ModalboxPayment.prototype.hide = function () {
