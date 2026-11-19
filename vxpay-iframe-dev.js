@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.6.0 */
+/** @version 1.6.1 */
 /*jshint strict:false */
 
 (function(window) {
@@ -1047,13 +1047,10 @@
 		}
 	};
 
-	ModalboxPayment.prototype._initSession = function (token) {
-		token = token || null;
-
+	ModalboxPayment.prototype._initSession = function () {
 		// init lazy loading session
 		this._postMessage(JSON.stringify({
-			type: 'modalbox-init-session',
-			token: token
+			type: 'modalbox-init-session'
 		}));
 	};
 
