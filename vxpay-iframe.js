@@ -696,13 +696,10 @@
 		}
 	};
 
-	ModalboxPayment.prototype._initSession = function (token) {
-		token = token || null;
-
+	ModalboxPayment.prototype._initSession = function () {
 		// init lazy loading session
 		this._postMessage(JSON.stringify({
-			type: 'modalbox-init-session',
-			token: token
+			type: 'modalbox-init-session'
 		}));
 	};
 
