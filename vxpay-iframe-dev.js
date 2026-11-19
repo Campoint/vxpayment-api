@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.5.56 */
+/** @version 1.5.57 */
 /*jshint strict:false */
 
 (function(window) {
@@ -379,6 +379,8 @@
 		// save viewport scale on start
 		this.view        = '';
 		this.iframeReady = false;
+		this._hasPendingShow = false;
+		this._pendingSends   = [];
 		this.ready       = false;
 		this.loaded      = false;
 		this.visible     = false;
@@ -592,9 +594,23 @@
 			modalbox._trigger('init', {
 				modalbox: modalbox
 			});
+
+			// show a view requested while the iframe was still loading
+			if (modalbox._hasPendingShow && modalbox.iframeReady) {
+				modalbox._hasPendingShow = false;
+				modalbox._showIframe(modalbox._pendingShowPath);
+			}
 		}
 		else if (msgObject.type === 'modalbox-content-loaded') {
 			modalbox.loaded = true;
+
+			// send options queued while the iframe was still loading
+			var pendingSends = modalbox._pendingSends;
+			modalbox._pendingSends = [];
+			pendingSends.forEach(function(send) {
+				send();
+			});
+
 			if (modalbox.visible) {
 				modalbox._initSession();
 
@@ -737,9 +753,9 @@
 		if (!this.iframeReady) {
 			this._initIframe();
 			this._showSpinner();
-			window.setTimeout(function() {
-				this._showIframe(path);
-			}.bind(this), 1000);
+			// shown by the 'modalbox-iframe-ready' message handler
+			this._pendingShowPath = path;
+			this._hasPendingShow  = true;
 			return false;
 		} else if(typeof path !== 'undefined' && path !== '') {
 			this._changeRoute('/' + path);
@@ -1393,13 +1409,8 @@
 			if (that.loaded) {
 				sendCallback();
 			} else {
-				var intSend = null;
-				intSend = window.setInterval(function () {
-					if (that.loaded) {
-						sendCallback();
-						window.clearInterval(intSend);
-					}
-				}, 500);
+				// sent by the 'modalbox-content-loaded' message handler
+				that._pendingSends.push(sendCallback);
 			}
 
 			if (this._getUseTab()) {
