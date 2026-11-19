@@ -1,30 +1,29 @@
 # Development
 
+Tasks run with [Task](https://taskfile.dev/). `task --list` shows them all.
+
 ## Prepare Dev Environment
 
-This task initializes the project, loading all dependencies etc.
+Install the dev dependencies and link the scripts into `http-root/`:
 
-`ant dev`
+`task init`
 
 ## Building new version
 
-As soon, as you've completed all the changes, it's time to release a new version.
+Edit `vxpay-iframe.js` only; the other `vxpay-iframe*.js` files are generated.
 
-### Release new API version - run release task
-- it runs syntax and code checks
-- runs unit tests and frontend tests (karma)
-- minifies javascript
-- updates current API version from the current git version tag 
+`task build` lints `vxpay-iframe.js`, writes the `package.json` version into its `@version` comment and regenerates
+`vxpay-iframe-api.min.js`, `vxpay-iframe.min.js`, `vxpay-iframe-dev.js` and `vxpay-iframe.esm.js`.
 
-Jus type:
+### Release new API version
 
-`ant release`
+Commit your changes first, then:
 
-Then you'll be shown the current version and can enter a new version tag.
+`task release VERSION=1.5.58`
 
-Afterwards, just push all the changes, as shown in the last hint from the `release` task.
+It pulls, sets the version in `package.json`, builds, packs `dist/VXPaymentApi-<version>.tgz`, commits "Api build" and
+tags the version. Then push the commit and the tag:
 
-`git push; git push --tags`
+`task push`
 
 The new version can then be deployed in other depending projects or `vxpayment-v3` - see README there.
-

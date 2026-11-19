@@ -1,0 +1,67 @@
+version: '3'
+
+vars:
+    NODE: '{{if eq OS "darwin"}}{{.NODE | default "node"}}{{else}}{{.NODE | default "/opt/node24/bin/node"}}{{end}}'
+    NPM: '{{if eq OS "darwin"}}{{.NPM | default "npm"}}{{else}}{{.NPM | default "/opt/node24/bin/npm"}}{{end}}'
+    BIN: node_modules/.bin
+
+tasks:
+    init:
+        desc: Install the dev dependencies and link the scripts into http-root for local testing
+        cmds:
+            - '{{.NPM}} ci --no-audit --no-fund'
+            - mkdir -p http-root
+            - ln -sfn ../vxpay-iframe.js http-root/vxpay-iframe.js
+            - ln -sfn ../vxpay-iframe.min.js http-root/vxpay-iframe.min.js
+            - ln -sfn ../spin.min.js http-root/spin.min.js
+
+    jshint:
+        desc: Lint vxpay-iframe.js
+        cmds:
+            - '{{.BIN}}/jshint --exclude-path=.jshintignore vxpay-iframe.js'
+
+    build:
+        desc: Lint, stamp the package.json version into vxpay-iframe.js and regenerate the min, dev and ESM files
+        deps: [jshint]
+        vars:
+            VERSION:
+                sh: '{{.NODE}} -p "require(\"./package.json\").version"'
+        cmds:
+            - rm -f vxpay-iframe-api.min.js vxpay-iframe.min.js vxpay-iframe-dev.js
+            - sed -i.bak -E 's/@version [0-9.a-z-]+/@version {{.VERSION}}/' vxpay-iframe.js && rm vxpay-iframe.js.bak
+            - '{{.BIN}}/uglifyjs vxpay-iframe.js --comments /version/ -o vxpay-iframe-api.min.js'
+            - '{{.BIN}}/grunt concat esm'
+
+    pack:
+        desc: Pack the current version as dist/VXPaymentApi-<version>.tgz
+        dir: dist
+        cmds:
+            - '{{.NPM}} pack ..'
+
+    release:
+        desc: 'Build and tag a new version, e.g. task release VERSION=1.5.58'
+        requires:
+            vars: [VERSION]
+        preconditions:
+            - sh: git diff --quiet HEAD
+              msg: Commit or stash your changes first.
+            - sh: '! git rev-parse -q --verify "refs/tags/{{.VERSION}}" >/dev/null'
+              msg: Tag {{.VERSION}} already exists.
+        cmds:
+            - git pull
+            - >-
+                echo "Current version $({{.NODE}} -p 'require("./package.json").version'), new version {{.VERSION}}"
+            - >-
+                sed -i.bak -E 's/("version": ")[0-9.a-z-]+"/\1{{.VERSION}}"/' package.json && rm package.json.bak
+            - task: build
+            - task: pack
+            - git add -A package.json vxpay-iframe-api.min.js vxpay-iframe.min.js vxpay-iframe-dev.js vxpay-iframe.esm.js vxpay-iframe.js dist/VXPaymentApi-{{.VERSION}}.tgz
+            - git commit -m "Api build"
+            - git tag {{.VERSION}}
+            - 'echo "New version is {{.VERSION}}. Push with: task push"'
+
+    push:
+        desc: Push the commits and tags
+        cmds:
+            - git push
+            - git push --tags

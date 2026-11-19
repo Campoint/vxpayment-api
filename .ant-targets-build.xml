@@ -1,8 +1,0 @@
-clean
-compressjs
-deleteBuild
-dev
-gettext
-init
-npm-pack
-release
