@@ -1,4 +1,4 @@
-export default /** @version 1.5.57 */
+export default /** @version 1.6.0 */
 /*jshint strict:false */
 
 (function(window) {
@@ -969,15 +969,6 @@ export default /** @version 1.5.57 */
 		if (!this._getUseTab()) {
 			this._initIframe();
 		}
-	};
-
-	/**
-	 * Init the session with a given token
-	 * @param token
-	 */
-	ModalboxPayment.prototype.loadSessionWithExternalToken = function (token) {
-		this.redirectToken = token;
-		this._initSession(token);
 	};
 
 	/**

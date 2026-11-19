@@ -349,7 +349,7 @@
 
 }));
 /* jshint ignore:end */
-/** @version 1.5.57 */
+/** @version 1.6.0 */
 /*jshint strict:false */
 
 (function(window) {
@@ -1320,15 +1320,6 @@
 		if (!this._getUseTab()) {
 			this._initIframe();
 		}
-	};
-
-	/**
-	 * Init the session with a given token
-	 * @param token
-	 */
-	ModalboxPayment.prototype.loadSessionWithExternalToken = function (token) {
-		this.redirectToken = token;
-		this._initSession(token);
 	};
 
 	/**
